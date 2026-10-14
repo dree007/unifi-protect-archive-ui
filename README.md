@@ -1,5 +1,7 @@
 # Unifi Protect Archive UI
 
+<img width="1710" height="920" alt="Sicherheitsdashboard mit verpixelten Ereignissen" src="https://github.com/user-attachments/assets/820fff05-c389-45fa-97a3-039e9c062986" />
+
 A self-hosted web app for browsing, searching and watching the UniFi Protect recordings you
 already export to a NAS. It reads your existing MP4 files and never changes them. It does not
 record cameras or replace your NVR.
@@ -11,7 +13,7 @@ This is an independent project. It is not affiliated with or supported by Ubiqui
 - One place to browse and search your archived recordings by camera, date and detection type.
 - Video playback with seeking, plus preview images.
 - An optional connection to your UniFi Protect console for camera names and detection events.
-- An interface in English and German.
+- Clips from the same situation but from different cameras are automatically aggregated and displayed as one. Clips can then be viewed independently (in v1.0.0 this only works in case there has been a connection to the Protect server at least once to fetch the camera names)
 
 ## Requirements
 
