@@ -4,6 +4,8 @@ A self-hosted web app for browsing, searching and watching the UniFi Protect rec
 already export to a NAS. It reads your existing MP4 files and never changes them. It does not
 record cameras or replace your NVR.
 
+<img width="1710" height="920" alt="Sicherheitsdashboard mit verpixelten Ereignissen" src="https://github.com/user-attachments/assets/820fff05-c389-45fa-97a3-039e9c062986" />
+
 This is an independent project. It is not affiliated with or supported by Ubiquiti.
 
 ## What you get
@@ -11,7 +13,10 @@ This is an independent project. It is not affiliated with or supported by Ubiqui
 - One place to browse and search your archived recordings by camera, date and detection type.
 - Video playback with seeking, plus preview images.
 - An optional connection to your UniFi Protect console for camera names and detection events.
-- An interface in English and German.
+- Clips from the same situation but from different cameras are automatically aggregated and displayed as one. Clips can then be viewed independently (in v1.0.0 this only works in case there has been a connection to the Protect server at least once to fetch the camera names)
+
+<img width="1564" height="1006" alt="Pixeliertes Sicherheitskamera-Archiv-Dashboard" src="https://github.com/user-attachments/assets/bba42823-5c21-4294-bd13-4e26cc3883d4" />
+
 
 ## Requirements
 
@@ -24,8 +29,8 @@ Everything else (database, ffmpeg, Node.js) is included in the containers.
 
 ```bash
 mkdir unifi-archive && cd unifi-archive
-curl -fsSLO https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.0.1/docker-compose.yml
-curl -fsSL -o .env https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.0.1/.env.example
+curl -fsSLO https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.0.0/compose.yaml
+curl -fsSL -o .env https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.0.0/.env.example
 chmod 600 .env
 ```
 
@@ -41,8 +46,7 @@ docker compose up -d
 ```
 
 Open `http://<your-server-ip>:3100` in your browser. The app starts indexing your recordings
-right away. The common settings are explained in [.env.example](.env.example), advanced ones in
-[docs/selfhosting.md](docs/selfhosting.md#configuration).
+right away. All settings are explained in [.env.example](.env.example).
 
 ## Keep it private
 
@@ -61,7 +65,7 @@ Read [SECURITY.md](SECURITY.md) before you install.
 
 ## Support
 
-Version 1.0.1 is built and tested for Linux amd64 with synthetic recordings and a simulated
+Version 1.0.0 is built and tested for Linux amd64 with synthetic recordings and a simulated
 Protect console. Real NAS setups, Protect versions, HTTPS proxies and single sign-on vary and are
 not individually tested.
 
