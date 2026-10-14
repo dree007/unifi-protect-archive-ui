@@ -1,0 +1,286 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design tokens – modern soft UI with calm pastels (docs/web-ui.md, "Gestaltung").
+ * Components use these names – never raw color values or ad-hoc shadows/radii. Light theme only.
+ *
+ *   surfaces   background (#F6F7FB) · card (white) · surface-muted (inset) · popover
+ *   text       foreground (#253047) · muted-foreground (secondary, ≥ 4.5:1 on all surfaces)
+ *   accents    primary (calm indigo, sparingly: buttons, focus, links) · selected (lavender
+ *              surface for active chips/tabs/navigation) · highlight
+ *   pastels    lavender · blue · mint · blush · peach · neutral – each as soft surface + ink
+ *   status     success · warning · danger · neutral – soft background + strong text
+ *   detection  person · vehicle · animal · package · face · plate · other – soft/ink/solid
+ *   shape      radius-card (24 px) · radius-control (14 px) · radius-inner (inside cards)
+ *   depth      shadow-card · shadow-elevated · shadow-control · shadow-inset
+ */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-geist-sans);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--danger-strong);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-surface-muted: var(--surface-muted);
+  --color-selected: var(--selected);
+  --color-selected-foreground: var(--selected-foreground);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
+  --color-media: var(--media);
+  --color-pastel-lavender: var(--pastel-lavender);
+  --color-pastel-lavender-ink: var(--pastel-lavender-ink);
+  --color-pastel-blue: var(--pastel-blue);
+  --color-pastel-blue-ink: var(--pastel-blue-ink);
+  --color-pastel-sky: var(--pastel-sky);
+  --color-pastel-sky-ink: var(--pastel-sky-ink);
+  --color-pastel-mint: var(--pastel-mint);
+  --color-pastel-mint-ink: var(--pastel-mint-ink);
+  --color-pastel-blush: var(--pastel-blush);
+  --color-pastel-blush-ink: var(--pastel-blush-ink);
+  --color-pastel-peach: var(--pastel-peach);
+  --color-pastel-peach-ink: var(--pastel-peach-ink);
+  --color-pastel-neutral: var(--pastel-neutral);
+  --color-pastel-neutral-ink: var(--pastel-neutral-ink);
+  --color-success-soft: var(--success-soft);
+  --color-success-strong: var(--success-strong);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-strong: var(--warning-strong);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-strong: var(--danger-strong);
+  --color-neutral-soft: var(--neutral-soft);
+  --color-neutral-strong: var(--neutral-strong);
+  --color-detect-person: var(--pastel-lavender);
+  --color-detect-person-ink: var(--pastel-lavender-ink);
+  --color-detect-person-solid: var(--detect-person-solid);
+  --color-detect-vehicle: var(--pastel-blue);
+  --color-detect-vehicle-ink: var(--pastel-blue-ink);
+  --color-detect-vehicle-solid: var(--detect-vehicle-solid);
+  --color-detect-animal: var(--pastel-mint);
+  --color-detect-animal-ink: var(--pastel-mint-ink);
+  --color-detect-animal-solid: var(--detect-animal-solid);
+  --color-detect-package: var(--pastel-blush);
+  --color-detect-package-ink: var(--pastel-blush-ink);
+  --color-detect-package-solid: var(--detect-package-solid);
+  --color-detect-face: var(--pastel-peach);
+  --color-detect-face-ink: var(--pastel-peach-ink);
+  --color-detect-face-solid: var(--detect-face-solid);
+  --color-detect-plate: var(--pastel-sky);
+  --color-detect-plate-ink: var(--pastel-sky-ink);
+  --color-detect-plate-solid: var(--detect-plate-solid);
+  --color-detect-other: var(--pastel-neutral);
+  --color-detect-other-ink: var(--pastel-neutral-ink);
+  --color-detect-other-solid: var(--detect-other-solid);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-card: var(--radius-card-value);
+  --radius-control: var(--radius-control-value);
+  --radius-inner: var(--radius-inner-value);
+  --shadow-card: var(--shadow-card-value);
+  --shadow-elevated: var(--shadow-elevated-value);
+  --shadow-control: var(--shadow-control-value);
+  --shadow-inset: var(--shadow-inset-value);
+}
+
+:root {
+  --radius: 0.875rem;
+  /* Cards 24 px, controls 14 px, previews inside a 12 px-padded card 16 px (≤ card radius). */
+  --radius-card-value: 1.5rem;
+  --radius-control-value: 0.875rem;
+  --radius-inner-value: 1rem;
+
+  /* surfaces */
+  --background: #f6f7fb;
+  --card: #ffffff;
+  --surface-muted: #f1f3f9;
+  --popover: #ffffff;
+  --muted: #f1f3f9;
+  /* video area: calm, dark slate instead of black */
+  --media: #1d2433;
+
+  /* text – secondary #5e6a80: 5.4:1 on white, 4.9:1 on surface-muted */
+  --foreground: #253047;
+  --card-foreground: var(--foreground);
+  --popover-foreground: var(--foreground);
+  --muted-foreground: #5e6a80;
+
+  /* accents: calm indigo for actions; active states use the lavender "selected" surface */
+  --primary: #5a5fc0;
+  --primary-foreground: #ffffff;
+  --secondary: #eeebfb;
+  --secondary-foreground: #463f99;
+  --selected: #eae6fa;
+  --selected-foreground: #3f3794;
+  --accent: var(--secondary);
+  --accent-foreground: var(--secondary-foreground);
+  --highlight: #b9d4f5;
+  --highlight-foreground: #2c4f86;
+
+  /* pastels: soft surface + ink (ink ≥ 6:1 on its surface) */
+  --pastel-lavender: #eae6fa;
+  --pastel-lavender-ink: #45399a;
+  --pastel-blue: #e5ebfa;
+  --pastel-blue-ink: #2c4b8c;
+  --pastel-sky: #e2f0f6;
+  --pastel-sky-ink: #1f5568;
+  --pastel-mint: #e0f1eb;
+  --pastel-mint-ink: #22614b;
+  --pastel-blush: #f8e9ef;
+  --pastel-blush-ink: #8a3356;
+  --pastel-peach: #fbeee3;
+  --pastel-peach-ink: #83461a;
+  --pastel-neutral: #f4f3f8;
+  --pastel-neutral-ink: #4a5468;
+
+  /* solid tones for bars and dots (decorative, always next to a text label) */
+  --detect-person-solid: #9a8fe6;
+  --detect-vehicle-solid: #86a3e6;
+  --detect-animal-solid: #79c2a5;
+  --detect-package-solid: #e39ab7;
+  --detect-face-solid: #eab184;
+  --detect-plate-solid: #7fbcd0;
+  --detect-other-solid: #b3b8c8;
+
+  /* status: soft background + strong foreground */
+  --success-soft: #e0f1eb;
+  --success-strong: #22614b;
+  --warning-soft: #fcf0dc;
+  --warning-strong: #7a4f0f;
+  --danger-soft: #fbe9ea;
+  --danger-strong: #a3323c;
+  --neutral-soft: #f1f3f9;
+  --neutral-strong: #4a5468;
+
+  /* separators: barely visible, cards use shadows instead of borders */
+  --border: #e6e9f2;
+  --input: #dde1ec;
+  --ring: #7074d3; /* focus ring: 4.1:1 on white (≥ 3:1 required) – used without opacity */
+
+  /* depth: large, very soft, ink-tinted shadows – no hard black, no double neumorphism */
+  --shadow-card-value: 0 0 0 1px rgb(37 48 71 / 0.035), 0 1px 2px rgb(37 48 71 / 0.04),
+    0 12px 32px -14px rgb(37 48 71 / 0.12);
+  --shadow-elevated-value: 0 0 0 1px rgb(37 48 71 / 0.04), 0 4px 10px -4px rgb(37 48 71 / 0.06),
+    0 24px 48px -18px rgb(69 57 154 / 0.2);
+  --shadow-control-value: 0 0 0 1px rgb(37 48 71 / 0.045), 0 2px 6px -2px rgb(37 48 71 / 0.08);
+  --shadow-inset-value: inset 0 1px 2px rgb(37 48 71 / 0.05);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  html {
+    @apply font-sans;
+  }
+  /* Calm by default; no motion at all for people who ask for it. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* The central soft-UI card: a slightly raised white surface. */
+@utility surface-card {
+  border-radius: var(--radius-card);
+  background-color: var(--card);
+  box-shadow: var(--shadow-card);
+}
+
+/* Cards that are links/buttons: lift slightly on hover (≤ 2 px), settle on press. */
+@utility surface-card-interactive {
+  border-radius: var(--radius-card);
+  background-color: var(--card);
+  box-shadow: var(--shadow-card);
+  transition:
+    transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 200ms ease;
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-elevated);
+    }
+  }
+  &:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-card);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    &:hover,
+    &:active {
+      transform: none;
+    }
+  }
+}
+
+/* Inset area inside a card (metrics, details) – no box-in-box borders. */
+@utility surface-inset {
+  border-radius: var(--radius-control);
+  background-color: var(--surface-muted);
+}
+
+/* Soft control (chips, selects, icon buttons): white, hairline + tiny shadow. */
+@utility surface-control {
+  background-color: var(--card);
+  box-shadow: var(--shadow-control);
+  transition:
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease;
+}
+
+/* Active chip / tab / navigation item: lavender surface, ink text, hairline in its own tone. */
+@utility surface-selected {
+  background-color: var(--selected);
+  color: var(--selected-foreground);
+  box-shadow:
+    inset 0 0 0 1px rgb(63 55 148 / 0.12),
+    0 1px 2px rgb(37 48 71 / 0.04);
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}

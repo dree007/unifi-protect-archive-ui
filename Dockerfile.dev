@@ -1,0 +1,10 @@
+# Development toolbox: Node.js 24 (.nvmrc) plus ffmpeg for thumbnails, so nothing has to be
+# installed on the host. The source is bind-mounted, not copied (see the `dev` service in
+# compose.yaml). Not a production image.
+FROM node:24-bookworm
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ffmpeg \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app

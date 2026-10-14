@@ -1,0 +1,261 @@
+# CI for Unifi Protect Archive UI: install, checks, database tests and build. No registry, no deployment.
+# Runs on the shared runner with the Docker executor (tag `docker`).
+
+default:
+  # Full image (not -slim): the migration drift check needs git.
+  image: node:24-bookworm
+  tags: [docker]
+  interruptible: true
+  cache:
+    key:
+      files: [package-lock.json]
+    paths: [.npm/]
+    policy: pull
+
+variables:
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+  NEXT_TELEMETRY_DISABLED: "1"
+
+stages: [install, check, build, container-test, release-build, release-compliance, release-publish]
+
+# Pipelines for merge requests and branches, without duplicates while an MR is open.
+workflow:
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v1\.0\.0(-rc\.[1-9][0-9]*)?$/ && $CI_COMMIT_REF_PROTECTED == "true"'
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
+install:
+  stage: install
+  cache:
+    key:
+      files: [package-lock.json]
+    paths: [.npm/]
+    policy: pull-push
+  # Only fills the npm download cache; node_modules is too large to pass on as an artifact.
+  script:
+    - npm ci --prefer-offline --no-audit
+
+.with-deps:
+  needs: [install]
+  before_script:
+    - npm ci --prefer-offline --no-audit
+
+typecheck:
+  extends: .with-deps
+  stage: check
+  script:
+    - npm run typecheck
+
+lint:
+  extends: .with-deps
+  stage: check
+  script:
+    - npm run lint
+
+publication:
+  extends: .with-deps
+  stage: check
+  script:
+    - npm run publication:check
+
+# All tests: unit tests (parser, file system scanner on temporary archives – no NAS needed) and
+# database tests against a throwaway PostgreSQL 18 service container. The credentials only
+# exist inside this job; they are not secrets. ffmpeg (Debian package) is installed only here,
+# for the thumbnail integration test.
+test:
+  extends: .with-deps
+  stage: check
+  services:
+    - name: postgres:18
+      alias: postgres
+  variables:
+    POSTGRES_DB: unifi_archive
+    POSTGRES_USER: unifi_archive
+    POSTGRES_PASSWORD: unifi_archive
+    DATABASE_URL: "postgresql://unifi_archive:unifi_archive@postgres:5432/unifi_archive"
+    TEST_DATABASE_URL: "postgresql://unifi_archive:unifi_archive@postgres:5432/unifi_archive"
+    # The thumbnail integration test needs the real ffmpeg; REQUIRE_FFMPEG makes it fail instead
+    # of being skipped if ffmpeg is missing (tests/unit/media-ffmpeg.test.ts).
+    REQUIRE_FFMPEG: "1"
+  script:
+    - apt-get update -qq && apt-get install -y -qq --no-install-recommends ffmpeg > /dev/null
+    - ffmpeg -version | head -n 1
+    - npm run db:wait
+    # The committed migrations must match the schema: generating must not produce new files.
+    - npm run db:check
+    - npm run db:generate
+    - git diff --exit-code -- drizzle && test -z "$(git status --porcelain -- drizzle)"
+    # Applies the migrations the same runtime migrator as the distribution (no drizzle-kit at runtime).
+    - npm run db:migrate
+    # The tests additionally migrate their own fresh database (tests/db/global-setup.ts).
+    - npm test
+
+# Browser tests against a production build of the app (docs/testing.md): own database on the
+# PostgreSQL service, a temporary archive with synthetic videos (ffmpeg), Chromium from Playwright.
+e2e:
+  extends: .with-deps
+  stage: check
+  services:
+    - name: postgres:18
+      alias: postgres
+  variables:
+    POSTGRES_DB: unifi_archive
+    POSTGRES_USER: unifi_archive
+    POSTGRES_PASSWORD: unifi_archive
+    DATABASE_URL: "postgresql://unifi_archive:unifi_archive@postgres:5432/unifi_archive"
+    TEST_DATABASE_URL: "postgresql://unifi_archive:unifi_archive@postgres:5432/unifi_archive"
+    PLAYWRIGHT_BROWSERS_PATH: "$CI_PROJECT_DIR/.cache/ms-playwright"
+  script:
+    - apt-get update -qq && apt-get install -y -qq --no-install-recommends ffmpeg > /dev/null
+    - npx playwright install --with-deps chromium > /dev/null
+    - npm run db:wait
+    - npm run test:e2e
+  artifacts:
+    when: on_failure
+    expire_in: 1 week
+    paths: [.cache/e2e/results/]
+
+# Built without DATABASE_URL and without ffmpeg: the build needs neither a database, the NAS
+# nor ffmpeg.
+build:
+  extends: .with-deps
+  stage: build
+  needs: [install, typecheck, lint, publication, test, e2e]
+  script:
+    - npm run build
+    # Production bundle of the background worker (docs/background-worker.md).
+    - npm run build:cli
+
+# Full distribution test: build, Compose validation, ffmpeg, web + worker runtime,
+# fresh/upgrade/repeated/failed migrations, fake Protect, media, outages and browser tests.
+# Uses only a job-private Docker-in-Docker daemon. Requires an existing runner that supports
+# DinD services; this repository does not change runner settings or contact a host daemon.
+docker-integration:
+  stage: container-test
+  image: docker:29-cli
+  tags: [docker-dind]
+  needs: [build]
+  services:
+    - name: docker:29-dind
+      alias: docker
+      command: ["--tls=false"]
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - mkdir -p .cache
+    - docker info
+    - docker compose version
+    - POSTGRES_PASSWORD=ci-validation NAS_ARCHIVE_HOST_PATH=/tmp docker compose --env-file /dev/null config -q
+  script:
+    - sh tests/docker/ci.sh
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths: [.cache/docker-ci.log, .cache/docker-browser-results/]
+
+# Only explicitly protected version refs enter this path. Branches/MRs/main merges
+# cannot publish; release-build holds no GHCR credentials and builds the reviewed export.
+release-build:
+  stage: release-build
+  image: docker:29-cli
+  tags: [docker-dind]
+  needs: [build, docker-integration]
+  interruptible: false
+  services:
+    - name: docker:29-dind
+      alias: docker
+      command: ["--tls=false"]
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v1\.0\.0(-rc\.[1-9][0-9]*)?$/ && $CI_COMMIT_REF_PROTECTED == "true"'
+    - when: never
+  script:
+    - docker info
+    - sh scripts/release/ci.sh build
+  # Small ledgers only. image.tar.gz (~240 MiB) goes to the private release-transfer Generic
+  # Package; release.json pins its SHA-256 and transfer-image.tar.gz.json records where it is.
+  # native-source.tar.gz does not exist yet: native-compliance creates it.
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - .cache/release/release.json
+      - .cache/release/validation.json
+      - .cache/release/source-files.json
+      - .cache/release/source.tar.gz
+      - .cache/release/layer-validation.json
+      - .cache/release/transfer-image.tar.gz.json
+      - .cache/release/build.log
+
+# Source acquisition is prepared once as a controlled, checksum-pinned input artifact.
+# Ordinary branch/MR jobs do not download native source packages.
+native-compliance:
+  stage: release-compliance
+  image: docker:29-cli
+  tags: [docker-dind]
+  needs:
+    - job: release-build
+      artifacts: true
+  interruptible: false
+  allow_failure: false
+  services:
+    - name: docker:29-dind
+      alias: docker
+      command: ["--tls=false"]
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v1\.0\.0(-rc\.[1-9][0-9]*)?$/ && $CI_COMMIT_REF_PROTECTED == "true"'
+    - when: never
+  script:
+    - sh scripts/release/ci.sh compliance
+  artifacts:
+    when: always
+    expire_in: 30 days
+    # native-source.tar.gz (~1 GB) goes to the release-transfer package; native-compliance.json
+    # pins its SHA-256.
+    paths:
+      - .cache/release/native-compliance.json
+      - .cache/release/release-assets.json
+      - .cache/release/transfer-native-source.tar.gz.json
+      - .cache/release/compliance.log
+
+# Configure/protect the ghcr-release environment and scope the PAT to this job's
+# environment before enabling publishing. These settings are not created by YAML.
+ghcr-publish:
+  stage: release-publish
+  image: docker:29-cli
+  tags: [docker-dind]
+  needs:
+    - job: release-build
+      artifacts: true
+    - job: native-compliance
+      artifacts: true
+  interruptible: false
+  resource_group: ghcr-release
+  environment:
+    name: ghcr-release
+  services:
+    - name: docker:29-dind
+      alias: docker
+      command: ["--tls=false"]
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v1\.0\.0(-rc\.[1-9][0-9]*)?$/ && $CI_COMMIT_REF_PROTECTED == "true"'
+      when: manual
+      allow_failure: false
+    - when: never
+  script:
+    - sh scripts/release/ci.sh publish
+  artifacts:
+    expire_in: 1 week
+    paths: [.cache/release/published-tag.txt, .cache/release/published.json, .cache/release/publish.log]

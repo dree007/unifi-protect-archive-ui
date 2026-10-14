@@ -1,0 +1,926 @@
+{
+  "id": "93ab5ccb-337b-4892-98b5-b2b3a6cc0393",
+  "prevId": "2d283db0-977b-443d-b217-c0126814b29d",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.cameras": {
+      "name": "cameras",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "protect_device_id": {
+          "name": "protect_device_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "model": {
+          "name": "model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mac": {
+          "name": "mac",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "state": {
+          "name": "state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "protect_state": {
+          "name": "protect_state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "smart_detect_types": {
+          "name": "smart_detect_types",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::text[]"
+        },
+        "last_seen_at": {
+          "name": "last_seen_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "cameras_protect_device_id_unique": {
+          "name": "cameras_protect_device_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "protect_device_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "cameras_protect_device_id_not_blank": {
+          "name": "cameras_protect_device_id_not_blank",
+          "value": "btrim(\"cameras\".\"protect_device_id\") <> ''"
+        },
+        "cameras_name_not_blank": {
+          "name": "cameras_name_not_blank",
+          "value": "btrim(\"cameras\".\"name\") <> ''"
+        },
+        "cameras_state_valid": {
+          "name": "cameras_state_valid",
+          "value": "\"cameras\".\"state\" in ('online', 'offline')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.archived_clips": {
+      "name": "archived_clips",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "camera_id": {
+          "name": "camera_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "camera_name": {
+          "name": "camera_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start_at": {
+          "name": "start_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "end_at": {
+          "name": "end_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "duration_ms": {
+          "name": "duration_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "file_path": {
+          "name": "file_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "file_name": {
+          "name": "file_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "file_size_bytes": {
+          "name": "file_size_bytes",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "file_modified_at": {
+          "name": "file_modified_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "day_directory": {
+          "name": "day_directory",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "discovered_at": {
+          "name": "discovered_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "last_seen_at": {
+          "name": "last_seen_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "archived_clips_start_at_idx": {
+          "name": "archived_clips_start_at_idx",
+          "columns": [
+            {
+              "expression": "start_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "archived_clips_camera_id_start_at_idx": {
+          "name": "archived_clips_camera_id_start_at_idx",
+          "columns": [
+            {
+              "expression": "camera_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "start_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "archived_clips_camera_id_cameras_id_fk": {
+          "name": "archived_clips_camera_id_cameras_id_fk",
+          "tableFrom": "archived_clips",
+          "tableTo": "cameras",
+          "columnsFrom": [
+            "camera_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "archived_clips_file_path_unique": {
+          "name": "archived_clips_file_path_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "file_path"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "archived_clips_camera_name_not_blank": {
+          "name": "archived_clips_camera_name_not_blank",
+          "value": "btrim(\"archived_clips\".\"camera_name\") <> ''"
+        },
+        "archived_clips_file_path_not_blank": {
+          "name": "archived_clips_file_path_not_blank",
+          "value": "btrim(\"archived_clips\".\"file_path\") <> ''"
+        },
+        "archived_clips_file_path_relative": {
+          "name": "archived_clips_file_path_relative",
+          "value": "\"archived_clips\".\"file_path\" !~ '^/' and \"archived_clips\".\"file_path\" !~ '(^|/)\\.\\.(/|$)'"
+        },
+        "archived_clips_file_name_not_blank": {
+          "name": "archived_clips_file_name_not_blank",
+          "value": "btrim(\"archived_clips\".\"file_name\") <> ''"
+        },
+        "archived_clips_day_directory_not_blank": {
+          "name": "archived_clips_day_directory_not_blank",
+          "value": "btrim(\"archived_clips\".\"day_directory\") <> ''"
+        },
+        "archived_clips_end_not_before_start": {
+          "name": "archived_clips_end_not_before_start",
+          "value": "\"archived_clips\".\"end_at\" >= \"archived_clips\".\"start_at\""
+        },
+        "archived_clips_duration_ms_non_negative": {
+          "name": "archived_clips_duration_ms_non_negative",
+          "value": "\"archived_clips\".\"duration_ms\" >= 0"
+        },
+        "archived_clips_file_size_bytes_non_negative": {
+          "name": "archived_clips_file_size_bytes_non_negative",
+          "value": "\"archived_clips\".\"file_size_bytes\" is null or \"archived_clips\".\"file_size_bytes\" >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.protect_events": {
+      "name": "protect_events",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "protect_event_id": {
+          "name": "protect_event_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "camera_id": {
+          "name": "camera_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "protect_device_id": {
+          "name": "protect_device_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "event_type": {
+          "name": "event_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start_at": {
+          "name": "start_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "end_at": {
+          "name": "end_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "smart_detect_types": {
+          "name": "smart_detect_types",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::text[]"
+        },
+        "first_received_at": {
+          "name": "first_received_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_received_at": {
+          "name": "last_received_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "protect_events_protect_device_id_idx": {
+          "name": "protect_events_protect_device_id_idx",
+          "columns": [
+            {
+              "expression": "protect_device_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "protect_events_start_at_idx": {
+          "name": "protect_events_start_at_idx",
+          "columns": [
+            {
+              "expression": "start_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "protect_events_camera_id_start_at_idx": {
+          "name": "protect_events_camera_id_start_at_idx",
+          "columns": [
+            {
+              "expression": "camera_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "start_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "protect_events_camera_id_cameras_id_fk": {
+          "name": "protect_events_camera_id_cameras_id_fk",
+          "tableFrom": "protect_events",
+          "tableTo": "cameras",
+          "columnsFrom": [
+            "camera_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "protect_events_protect_event_id_unique": {
+          "name": "protect_events_protect_event_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "protect_event_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "protect_events_protect_event_id_not_blank": {
+          "name": "protect_events_protect_event_id_not_blank",
+          "value": "btrim(\"protect_events\".\"protect_event_id\") <> ''"
+        },
+        "protect_events_protect_device_id_not_blank": {
+          "name": "protect_events_protect_device_id_not_blank",
+          "value": "btrim(\"protect_events\".\"protect_device_id\") <> ''"
+        },
+        "protect_events_event_type_not_blank": {
+          "name": "protect_events_event_type_not_blank",
+          "value": "btrim(\"protect_events\".\"event_type\") <> ''"
+        },
+        "protect_events_end_not_before_start": {
+          "name": "protect_events_end_not_before_start",
+          "value": "\"protect_events\".\"end_at\" is null or \"protect_events\".\"end_at\" >= \"protect_events\".\"start_at\""
+        },
+        "protect_events_received_order": {
+          "name": "protect_events_received_order",
+          "value": "\"protect_events\".\"last_received_at\" >= \"protect_events\".\"first_received_at\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.archive_event_clips": {
+      "name": "archive_event_clips",
+      "schema": "",
+      "columns": {
+        "archive_event_id": {
+          "name": "archive_event_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "archived_clip_id": {
+          "name": "archived_clip_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "archive_event_clips_archived_clip_id_idx": {
+          "name": "archive_event_clips_archived_clip_id_idx",
+          "columns": [
+            {
+              "expression": "archived_clip_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "archive_event_clips_archive_event_id_archive_events_id_fk": {
+          "name": "archive_event_clips_archive_event_id_archive_events_id_fk",
+          "tableFrom": "archive_event_clips",
+          "tableTo": "archive_events",
+          "columnsFrom": [
+            "archive_event_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "archive_event_clips_archived_clip_id_archived_clips_id_fk": {
+          "name": "archive_event_clips_archived_clip_id_archived_clips_id_fk",
+          "tableFrom": "archive_event_clips",
+          "tableTo": "archived_clips",
+          "columnsFrom": [
+            "archived_clip_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "archive_event_clips_archive_event_id_archived_clip_id_pk": {
+          "name": "archive_event_clips_archive_event_id_archived_clip_id_pk",
+          "columns": [
+            "archive_event_id",
+            "archived_clip_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.archive_event_protect_events": {
+      "name": "archive_event_protect_events",
+      "schema": "",
+      "columns": {
+        "archive_event_id": {
+          "name": "archive_event_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "protect_event_id": {
+          "name": "protect_event_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "archive_event_protect_events_protect_event_id_idx": {
+          "name": "archive_event_protect_events_protect_event_id_idx",
+          "columns": [
+            {
+              "expression": "protect_event_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "archive_event_protect_events_archive_event_id_archive_events_id_fk": {
+          "name": "archive_event_protect_events_archive_event_id_archive_events_id_fk",
+          "tableFrom": "archive_event_protect_events",
+          "tableTo": "archive_events",
+          "columnsFrom": [
+            "archive_event_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "archive_event_protect_events_protect_event_id_protect_events_id_fk": {
+          "name": "archive_event_protect_events_protect_event_id_protect_events_id_fk",
+          "tableFrom": "archive_event_protect_events",
+          "tableTo": "protect_events",
+          "columnsFrom": [
+            "protect_event_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "archive_event_protect_events_archive_event_id_protect_event_id_pk": {
+          "name": "archive_event_protect_events_archive_event_id_protect_event_id_pk",
+          "columns": [
+            "archive_event_id",
+            "protect_event_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.archive_events": {
+      "name": "archive_events",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "start_at": {
+          "name": "start_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "end_at": {
+          "name": "end_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metadata_status": {
+          "name": "metadata_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "archive_events_start_at_idx": {
+          "name": "archive_events_start_at_idx",
+          "columns": [
+            {
+              "expression": "start_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "archive_events_metadata_status_start_at_idx": {
+          "name": "archive_events_metadata_status_start_at_idx",
+          "columns": [
+            {
+              "expression": "metadata_status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "start_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "archive_events_metadata_status_valid": {
+          "name": "archive_events_metadata_status_valid",
+          "value": "\"archive_events\".\"metadata_status\" in ('matched', 'archiveOnly', 'pendingClip')"
+        },
+        "archive_events_end_not_before_start": {
+          "name": "archive_events_end_not_before_start",
+          "value": "\"archive_events\".\"end_at\" is null or \"archive_events\".\"end_at\" >= \"archive_events\".\"start_at\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.archive_scan_runs": {
+      "name": "archive_scan_runs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuidv7()"
+        },
+        "archive_root": {
+          "name": "archive_root",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "timestamp (3) with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "finished_at": {
+          "name": "finished_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'running'"
+        },
+        "day_directory_count": {
+          "name": "day_directory_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "discovered_count": {
+          "name": "discovered_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "updated_count": {
+          "name": "updated_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "unchanged_count": {
+          "name": "unchanged_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "failed_count": {
+          "name": "failed_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "warning_count": {
+          "name": "warning_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "missing_count": {
+          "name": "missing_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "error_message": {
+          "name": "error_message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "archive_scan_runs_status_started_at_idx": {
+          "name": "archive_scan_runs_status_started_at_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "started_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "archive_scan_runs_single_running_idx": {
+          "name": "archive_scan_runs_single_running_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"archive_scan_runs\".\"status\" = 'running'",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "archive_scan_runs_status_valid": {
+          "name": "archive_scan_runs_status_valid",
+          "value": "\"archive_scan_runs\".\"status\" in ('running', 'completed', 'failed')"
+        },
+        "archive_scan_runs_archive_root_not_blank": {
+          "name": "archive_scan_runs_archive_root_not_blank",
+          "value": "btrim(\"archive_scan_runs\".\"archive_root\") <> ''"
+        },
+        "archive_scan_runs_finished_when_done": {
+          "name": "archive_scan_runs_finished_when_done",
+          "value": "(\"archive_scan_runs\".\"status\" = 'running') = (\"archive_scan_runs\".\"finished_at\" is null)"
+        },
+        "archive_scan_runs_counts_non_negative": {
+          "name": "archive_scan_runs_counts_non_negative",
+          "value": "least(\"archive_scan_runs\".\"day_directory_count\", \"archive_scan_runs\".\"discovered_count\", \"archive_scan_runs\".\"updated_count\", \"archive_scan_runs\".\"unchanged_count\", \"archive_scan_runs\".\"failed_count\", \"archive_scan_runs\".\"warning_count\", coalesce(\"archive_scan_runs\".\"missing_count\", 0)) >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

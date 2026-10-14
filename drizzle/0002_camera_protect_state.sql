@@ -1,0 +1,1 @@
+ALTER TABLE "cameras" ADD COLUMN "protect_state" text;

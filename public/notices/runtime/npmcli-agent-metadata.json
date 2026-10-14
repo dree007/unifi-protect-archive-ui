@@ -1,0 +1,10 @@
+{
+  "name": "@npmcli/agent",
+  "version": "4.0.2",
+  "license": "ISC",
+  "author": "GitHub Inc.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/npm/agent.git"
+  }
+}
