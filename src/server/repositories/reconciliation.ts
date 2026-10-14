@@ -172,13 +172,19 @@ export async function findMultiCameraCandidates(
   return result.rows;
 }
 
+/** SQL form of `fallbackCameraKey` (matching/temporal-fallback.ts) for archived_clips alias `alias`. */
+const FALLBACK_CAMERA_KEY = (alias: "a" | "b") =>
+  sql.raw(`coalesce(${alias}.camera_id::text, 'name:' || ${alias}.camera_name)`);
+
 /**
- * Clip pairs of different, resolved cameras whose starts are at most `startToleranceMs` and whose
- * ends are at most `endToleranceMs` apart (temporal fallback candidates), each pair once
+ * Clip pairs of different cameras whose starts are at most `startToleranceMs` and whose ends are
+ * at most `endToleranceMs` apart (temporal fallback candidates), each pair once
  * (a.id < b.id). Pairs already in the same archive event are left out: their grouping is
  * re-checked via {@link findTemporalFallbackEventIds}. The start bound is an index range on
  * `start_at`, so each clip only looks at clips around its own start – no comparison of all
- * clips with all others. Overlap (IoU) and metadata are decided by the pure rules.
+ * clips with all others. Overlap (IoU) and metadata are decided by the pure rules. Cameras are
+ * compared by `fallbackCameraKey` (matching/temporal-fallback.ts): clips without a resolved
+ * camera (no Protect yet) take part under their file-name camera.
  */
 export async function findTemporalFallbackCandidates(
   startToleranceMs: number,
@@ -192,11 +198,11 @@ export async function findTemporalFallbackCandidates(
       on b.start_at >= a.start_at - make_interval(secs => ${startToleranceMs / 1000})
      and b.start_at <= a.start_at + make_interval(secs => ${startToleranceMs / 1000})
      and b.id > a.id
-     and b.camera_id <> a.camera_id
+     and ${FALLBACK_CAMERA_KEY("b")} <> ${FALLBACK_CAMERA_KEY("a")}
      and b.end_at >= a.end_at - make_interval(secs => ${endToleranceMs / 1000})
      and b.end_at <= a.end_at + make_interval(secs => ${endToleranceMs / 1000})
      and b.end_at > b.start_at
-    where a.camera_id is not null and b.camera_id is not null and a.end_at > a.start_at
+    where a.end_at > a.start_at
       and not exists (
         select 1 from archive_event_clips la
         join archive_event_clips lb on lb.archive_event_id = la.archive_event_id and lb.archived_clip_id = b.id
@@ -221,18 +227,21 @@ export async function findTemporalFallbackEventIds(db: DbExecutor): Promise<stri
 export interface ClipFacts {
   id: string;
   cameraId: string | null;
+  /** Camera name from the file name (NFC-normalized, trimmed by the parser). */
+  cameraName: string;
   startAt: Date;
   endAt: Date;
 }
 
 export async function loadClipFacts(clipIds: readonly string[], db: DbExecutor): Promise<ClipFacts[]> {
   if (clipIds.length === 0) return [];
-  const result = await db.execute<{ id: string; camera_id: string | null; start_at: string; end_at: string }>(
-    sql`select id, camera_id, start_at, end_at from archived_clips where id = any(${uuidArray(clipIds)})`,
+  const result = await db.execute<{ id: string; camera_id: string | null; camera_name: string; start_at: string; end_at: string }>(
+    sql`select id, camera_id, camera_name, start_at, end_at from archived_clips where id = any(${uuidArray(clipIds)})`,
   );
   return result.rows.map((row) => ({
     id: row.id,
     cameraId: row.camera_id,
+    cameraName: row.camera_name,
     startAt: new Date(row.start_at),
     endAt: new Date(row.end_at),
   }));

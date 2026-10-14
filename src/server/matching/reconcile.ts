@@ -30,7 +30,7 @@ import {
 
 import { DEFAULT_MATCHING_CONFIG, type MatchingConfig } from "./config";
 import { groupComponents } from "./grouping";
-import { clusterTemporalFallback, type ClipWithMetadata, type FallbackGroup } from "./temporal-fallback";
+import { clusterTemporalFallback, fallbackCameraKey, type ClipWithMetadata, type FallbackGroup } from "./temporal-fallback";
 import { canGroupAcrossCameras, isClipMatch, type DetectionInterval } from "./temporal-match";
 
 /**
@@ -273,7 +273,8 @@ async function run(
   step("primary groups");
 
   // 5. Priority 2 – temporal fallback over whole primary groups. A clip's metadata are the
-  //    Protect events matched to exactly this clip.
+  //    Protect events matched to exactly this clip; its camera is the fallback camera key
+  //    (file-name camera while unresolved).
   const clipFacts = await loadClipFacts([...componentOfClip.keys()], db);
   const matchedProtect = new Map<string, DetectionInterval[]>();
   for (const match of clipMatches) {
@@ -285,7 +286,7 @@ async function run(
   for (const clip of clipFacts) {
     const key = componentOfClip.get(clip.id)!.key;
     const list = clipsOfComponent.get(key) ?? [];
-    list.push({ ...clip, protectEvents: matchedProtect.get(clip.id) ?? [] });
+    list.push({ id: clip.id, cameraId: fallbackCameraKey(clip), startAt: clip.startAt, endAt: clip.endAt, protectEvents: matchedProtect.get(clip.id) ?? [] });
     clipsOfComponent.set(key, list);
   }
   const fallbackGroups: FallbackGroup[] = components.map((component) => {

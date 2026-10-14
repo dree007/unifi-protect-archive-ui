@@ -15,7 +15,7 @@
     "Dockerfile",
     "Dockerfile.dev",
     "Dockerfile.dev.dockerignore",
-    "compose.yaml",
+    "docker-compose.yml",
     "compose.dev.yaml",
     ".env.example",
     ".gitignore",

@@ -125,7 +125,7 @@ it("an approved file/hash list alone cannot bypass full corresponding-source val
 });
 
 it("production Compose uses prebuilt images and CI publishes only manually on protected version refs", async () => {
-  const compose = YAML.load(await readFile("compose.yaml", "utf8")) as { services: Record<string, Record<string, unknown>> };
+  const compose = YAML.load(await readFile("docker-compose.yml", "utf8")) as { services: Record<string, Record<string, unknown>> };
   expect(Object.keys(compose.services)).toEqual(["postgres", "migrate", "web", "worker"]);
   for (const service of Object.values(compose.services) as Record<string, unknown>[]) {
     for (const key of ["build", "stop_grace_period", "init", "logging"]) expect(service).not.toHaveProperty(key);
@@ -150,7 +150,7 @@ it("production Compose uses prebuilt images and CI publishes only manually on pr
 it("runs release jobs only for protected version tags, never for branches or web pipelines", async () => {
   const source = await readFile(".gitlab-ci.yml", "utf8");
   const ci = YAML.load(source) as Record<string, { rules: { if?: string; when?: string }[] }>;
-  const tagRule = '$CI_COMMIT_TAG =~ /^v1\\.0\\.0(-rc\\.[1-9][0-9]*)?$/ && $CI_COMMIT_REF_PROTECTED == "true"';
+  const tagRule = '$CI_COMMIT_TAG =~ /^v1\\.0\\.[01](-rc\\.[1-9][0-9]*)?$/ && $CI_COMMIT_REF_PROTECTED == "true"';
   for (const name of ["release-build", "native-compliance"]) expect(ci[name].rules).toEqual([{ if: tagRule }, { when: "never" }]);
   expect(ci["ghcr-publish"].rules).toHaveLength(2);
   expect(ci["ghcr-publish"].rules[0].if).toBe(tagRule);

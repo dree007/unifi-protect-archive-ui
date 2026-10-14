@@ -6,17 +6,19 @@ import { promisify } from "node:util";
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { REGISTRY_IMAGE, releaseImageTag, releaseVersion } from "../../scripts/release/metadata.mts";
+import { MANIFEST_ACCEPT, REGISTRY_IMAGE, releaseImageTag, releaseVersion } from "../../scripts/release/metadata.mts";
 
 describe("release candidate versioning", () => {
-  it("tags a candidate with its own version and only 1.0.0 as the final image", () => {
+  it("tags a candidate with its own version and only 1.0.0/1.0.1 as final images", () => {
     expect(releaseImageTag("1.0.0")).toBe(`${REGISTRY_IMAGE}:1.0.0`);
+    expect(releaseImageTag("1.0.1")).toBe(`${REGISTRY_IMAGE}:1.0.1`);
+    expect(releaseImageTag("1.0.1-rc.1")).toBe(`${REGISTRY_IMAGE}:1.0.1-rc.1`);
     expect(releaseImageTag("1.0.0-rc.1")).toBe(`${REGISTRY_IMAGE}:1.0.0-rc.1`);
     expect(releaseImageTag("1.0.0-rc.12")).toBe(`${REGISTRY_IMAGE}:1.0.0-rc.12`);
     expect(releaseImageTag("1.0.0-rc.1")).not.toBe(releaseImageTag("1.0.0"));
   });
 
-  it.each(["", "latest", "v1.0.0", "1.0.0-rc.0", "1.0.0-rc.01", "1.0.1", "1.0.0-beta.1", "1.0.0-rc.1 "])("rejects %j as a release version", (value) => {
+  it.each(["", "latest", "v1.0.0", "1.0.0-rc.0", "1.0.0-rc.01", "1.0.2", "1.1.0", "1.0.10", "1.0.1-rc.0", "1.0.0-beta.1", "1.0.0-rc.1 "])("rejects %j as a release version", (value) => {
     expect(() => releaseVersion(value)).toThrow();
     expect(() => releaseImageTag(value)).toThrow();
   });
@@ -28,6 +30,15 @@ describe("release candidate versioning", () => {
       expect(script).not.toMatch(/unifi-protect-archive-ui:1\.0\.0|unifi-protect-archive-ui:\$\{/);
     }
     expect(await readFile("scripts/release/native-bundle.mts", "utf8")).toContain("image: releaseImageTag(release.version)");
+  });
+
+  it("checks registry tags with image index types, as Docker 29 pushes an OCI index", async () => {
+    for (const type of ["application/vnd.oci.image.index.v1+json", "application/vnd.docker.distribution.manifest.list.v2+json", "application/vnd.oci.image.manifest.v1+json"]) {
+      expect(MANIFEST_ACCEPT).toContain(type);
+    }
+    const script = await readFile("scripts/release/publish.mts", "utf8");
+    expect(script.match(/Accept: MANIFEST_ACCEPT/g)).toHaveLength(2);
+    expect(script).not.toContain('Accept: "application/vnd.oci.image.manifest.v1+json');
   });
 });
 
@@ -57,7 +68,7 @@ describe("release job guard (scripts/release/ci.sh)", () => {
   }
 
   it.each(["build", "compliance", "publish"])("lets %s through only for a protected version tag", async (operation) => {
-    for (const tag of ["v1.0.0", "v1.0.0-rc.1", "v1.0.0-rc.10"]) {
+    for (const tag of ["v1.0.0", "v1.0.0-rc.1", "v1.0.0-rc.10", "v1.0.1", "v1.0.1-rc.1"]) {
       expect((await guard(operation, { CI_COMMIT_TAG: tag, CI_COMMIT_REF_PROTECTED: "true" })).code).toBe(DOCKER_REACHED);
     }
   });
@@ -68,7 +79,9 @@ describe("release job guard (scripts/release/ci.sh)", () => {
     { CI_COMMIT_TAG: "v1.0.0" },
     { CI_COMMIT_TAG: "v1.0.0", CI_COMMIT_REF_PROTECTED: "false" },
     { CI_COMMIT_TAG: "v1.0.0-rc.0", CI_COMMIT_REF_PROTECTED: "true" },
-    { CI_COMMIT_TAG: "v1.0.1", CI_COMMIT_REF_PROTECTED: "true" },
+    { CI_COMMIT_TAG: "v1.0.2", CI_COMMIT_REF_PROTECTED: "true" },
+    { CI_COMMIT_TAG: "v1.0.10", CI_COMMIT_REF_PROTECTED: "true" },
+    { CI_COMMIT_TAG: "v1.0.1-rc.0", CI_COMMIT_REF_PROTECTED: "true" },
     { CI_COMMIT_TAG: "1.0.0", CI_COMMIT_REF_PROTECTED: "true" },
     { CI_COMMIT_TAG: "v1.0.0-rc.1x", CI_COMMIT_REF_PROTECTED: "true" },
     { CI_COMMIT_TAG: "v1.0.0\nv1.0.0", CI_COMMIT_REF_PROTECTED: "true" },
@@ -78,7 +91,7 @@ describe("release job guard (scripts/release/ci.sh)", () => {
     for (const operation of ["build", "compliance", "publish"]) {
       const result = await guard(operation, env);
       expect(result.code).toBe(2);
-      expect(result.stderr).toContain("protected v1.0.0 or v1.0.0-rc.N tag");
+      expect(result.stderr).toContain("protected v1.0.0, v1.0.1 or matching -rc.N tag");
     }
   });
 });

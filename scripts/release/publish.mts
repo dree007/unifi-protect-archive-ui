@@ -5,7 +5,7 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 
 import { digest, type SourceFile } from "./source.mts";
-import { fileDigest, publishingGate, releaseImageTag, requireAbsentTag, verifyPublicTree, verifyImage, type ReleaseManifest, type Validation } from "./metadata.mts";
+import { MANIFEST_ACCEPT, fileDigest, publishingGate, releaseImageTag, requireAbsentTag, verifyPublicTree, verifyImage, type ReleaseManifest, type Validation } from "./metadata.mts";
 import { inspectRuntimeLayers } from "./layers.mts";
 import { extractNativeArchive, inspectRuntime, runtimeIdentity, validateNativeBundle, run, type NativeValidation } from "./native-compliance.mts";
 
@@ -90,7 +90,7 @@ const tag = releaseImageTag(manifest.version);
 // packages still require an explicit manifest 404; other errors fail closed.
 if (packageExists) {
   const existing = await fetch(`https://ghcr.io/v2/dree007/unifi-protect-archive-ui/manifests/${manifest.version}`, {
-    method: "HEAD", headers: { Authorization: `Bearer ${await registryBearer()}`, Accept: "application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json" },
+    method: "HEAD", headers: { Authorization: `Bearer ${await registryBearer()}`, Accept: MANIFEST_ACCEPT },
     redirect: "error", signal: AbortSignal.timeout(30_000),
   });
   requireAbsentTag(existing.status);
@@ -114,7 +114,7 @@ try {
   await docker(["login", "ghcr.io", "--username", username, "--password-stdin"], token);
   await docker(["push", tag]);
   const published = await fetch(`https://ghcr.io/v2/dree007/unifi-protect-archive-ui/manifests/${manifest.version}`, {
-    method: "HEAD", headers: { Authorization: `Bearer ${await registryBearer()}`, Accept: "application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json" },
+    method: "HEAD", headers: { Authorization: `Bearer ${await registryBearer()}`, Accept: MANIFEST_ACCEPT },
     redirect: "error", signal: AbortSignal.timeout(30_000),
   });
   const registryDigest = published.headers.get("docker-content-digest");

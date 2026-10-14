@@ -134,7 +134,7 @@ describe("temporal fallback: historic clips without Protect metadata", () => {
     expect(result).toMatchObject({ archiveEventsMerged: 0, archiveEventsSplit: 0, temporalLinksAdded: 0, temporalLinksRemoved: 0 });
   });
 
-  it("does not group clips whose camera name is ambiguous (two cameras with the same name)", async () => {
+  it("leaves an ambiguous camera name unresolved but groups it by its file-name camera, never with itself", async () => {
     const w = await world();
     await upsertCameras(
       [
@@ -143,11 +143,89 @@ describe("temporal fallback: historic clips without Protect metadata", () => {
       ],
       w.db,
     );
+    // Two simultaneous "Carport" clips: one identity for both cameras, so at most one joins.
+    await w.clip("Carport", ...EINFAHRT);
     await w.clip("Carport", ...EINFAHRT);
     await w.clip("Doorbell", ...KLINGEL);
     const result = await w.reconcile();
     expect(result.unresolvedCameraNames).toEqual(["Carport"]);
+    expect(shape(await w.snapshot()).map((event) => event.clips)).toEqual([
+      ["Carport 13:01:05", "Doorbell 13:01:04"],
+      ["Carport 13:01:05"],
+    ]);
+  });
+});
+
+describe("temporal fallback: without any Protect connection", () => {
+  /** A world as after a fresh NAS-only installation: no camera is known. */
+  async function nasOnly() {
+    const w = await world();
+    await w.db.execute(sql`delete from cameras`);
+    return w;
+  }
+
+  it("groups clips of different cameras by their file-name camera", async () => {
+    const w = await nasOnly();
+    await w.clip("Einfahrt", ...EINFAHRT);
+    await w.clip("Klingel", ...KLINGEL);
+    await w.clip("Garten", "14:00:00", "14:00:30");
+    const result = await w.reconcile();
+    expect(shape(await w.snapshot())).toEqual([
+      { status: "archiveOnly", start: "13:01:04", end: "13:02:18", clips: ["Einfahrt 13:01:05", "Klingel 13:01:04"], protect: [] },
+      { status: "archiveOnly", start: "14:00:00", end: "14:00:30", clips: ["Garten 14:00:00"], protect: [] },
+    ]);
+    expect(result).toMatchObject({
+      clipCamerasResolved: 0,
+      unresolvedCameraNames: ["Einfahrt", "Garten", "Klingel"],
+      temporalCandidates: 1,
+      temporalFallbackEvents: 1,
+      temporalLinksAdded: 1,
+    });
+  });
+
+  it("never groups consecutive clips of the same file-name camera", async () => {
+    const w = await nasOnly();
+    await w.clip("Einfahrt", "13:00:00", "13:00:30");
+    await w.clip("Einfahrt", "13:00:02", "13:00:31");
+    await w.reconcile();
     expect(await w.snapshot()).toHaveLength(2);
+  });
+
+  it("keeps the event when Protect becomes available and resolves the cameras later", async () => {
+    const w = await nasOnly();
+    await w.clip("Einfahrt", ...EINFAHRT);
+    await w.clip("Klingel", ...KLINGEL);
+    await w.reconcile();
+    const before = await w.snapshot();
+    const groupsBefore = await primaryGroups(w.db);
+
+    await upsertCameras(
+      [
+        { protectDeviceId: "aaaaaaaaaaaaaaaaaaaaaaaa", name: "Einfahrt", state: "online" },
+        { protectDeviceId: "bbbbbbbbbbbbbbbbbbbbbbbb", name: "Klingel", state: "online" },
+      ],
+      w.db,
+    );
+    const result = await w.reconcile();
+    expect(await w.snapshot()).toEqual(before);
+    expect(await primaryGroups(w.db)).toEqual(groupsBefore);
+    expect(result).toMatchObject({
+      clipCamerasResolved: 2,
+      archiveEventsCreated: 0,
+      archiveEventsMerged: 0,
+      archiveEventsSplit: 0,
+      temporalLinksAdded: 0,
+      temporalLinksRemoved: 0,
+    });
+  });
+
+  it("groups a resolved camera with one that is only known by its file name", async () => {
+    const w = await world();
+    await w.clip("Carport", ...EINFAHRT);
+    await w.clip("Doorbell", ...KLINGEL);
+    const result = await w.reconcile();
+    expect(result.unresolvedCameraNames).toEqual(["Carport"]);
+    expect(shape(await w.snapshot()).map((event) => event.clips)).toEqual([["Carport 13:01:05", "Doorbell 13:01:04"]]);
   });
 });
 

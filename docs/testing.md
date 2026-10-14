@@ -15,7 +15,15 @@ DB/NAS. Node24 and PostgreSQL18 are required. Browser tests additionally require
 
 Use Node 24, PostgreSQL 18 and ffmpeg for development, or the separate development container in
 [compose.dev.yaml](../compose.dev.yaml). Development scripts read a private `.env.local`; production
-Compose reads `.env`. Never point tests at the production database or NAS.
+Compose reads `.env`. Never point tests at the production database or NAS. A typical `.env.local`:
+
+```bash
+DATABASE_URL=postgresql://unifi_archive:unifi_archive@localhost:5432/unifi_archive
+TEST_DATABASE_URL=postgresql://unifi_archive:unifi_archive@localhost:5432/unifi_archive
+ARCHIVE_ROOT=/path/to/archive
+# Optional: ARCHIVE_REQUIRED_MOUNT=, THUMBNAIL_CACHE_ROOT=.cache/thumbnails, FFMPEG_PATH=ffmpeg,
+# ALLOWED_DEV_ORIGINS=
+```
 
 ```bash
 npm ci
@@ -96,7 +104,7 @@ as passed on an older daemon. Browser tests use synthetic media and also validat
 a candidate from exactly that context. It writes source/image/native metadata and a local image
 archive without any registry push. Run the full distribution suite with `DOCKER_TEST_IMAGE` set
 to that existing tag. Tests create separate volumes/projects and never use real NAS/Protect keys.
-The source-free scenario contains only `compose.yaml` and `.env`, with its archive outside the
+The source-free scenario contains only `docker-compose.yml` and `.env`, with its archive outside the
 installation directory. Source archive creation is local preparation, not GitHub publication.
 
 Process tests use direct Node PID 1, host-default logging and Docker's default stop timeout.

@@ -175,7 +175,7 @@ describe("background worker", () => {
   it("works without Protect: NAS scan + temporal fallback only, Protect shown as disabled", async () => {
     const { db, url } = await createIsolatedDb();
     const archive = await archiveWithClips();
-    // Cameras known from an earlier Protect sync (the fallback needs resolved cameras).
+    // Cameras known from an earlier Protect sync (resolved cameras; file names alone also suffice).
     await upsertCameras(
       ["Garden", "Driveway", "Doorbell"].map((name, index) => ({ protectDeviceId: `65000000000000000000000${index}`, name, state: "offline" as const })),
       db,
@@ -193,16 +193,15 @@ describe("background worker", () => {
     expect(await state(db, "protect")).toBe("disabled");
   });
 
-  it("without Protect and without any known camera: every clip becomes its own archive event", async () => {
-    // Existing matching rule (docs/event-matching.md): the temporal fallback only joins clips of
-    // resolved, different cameras – camera names alone are not trusted.
+  it("without Protect and without any known camera: simultaneous clips are grouped by file-name camera", async () => {
+    // docs/event-matching.md: unresolved clips take part in the temporal fallback under the
+    // camera name from their file name, so a NAS-only installation groups too.
     const { db, url } = await createIsolatedDb();
     const archive = await archiveWithClips();
     const worker = startWorker({ url, archiveRoot: archive.root });
     await waitFor(async () => (await state(db, "reconciliation")) === "success");
     expect((await snapshot(db)).map(({ status, clips }) => ({ status, clips }))).toEqual([
-      { status: "archiveOnly", clips: ["Garden 08:00:00"] },
-      { status: "archiveOnly", clips: ["Driveway 08:00:01"] },
+      { status: "archiveOnly", clips: ["Driveway 08:00:01", "Garden 08:00:00"] },
       { status: "archiveOnly", clips: ["Doorbell 08:20:00"] },
     ]);
     await worker.stop();
@@ -268,7 +267,7 @@ describe("background worker", () => {
     expect(await state(db, "worker")).toBe("running");
     await pool.query("drop trigger fail_archive_events on archive_events");
     await waitFor(async () => (await state(db, "reconciliation")) === "success");
-    expect((await statusRows(db)).reconciliation.details).toMatchObject({ archiveEventsCreated: 3, temporalFallbackEvents: 0 });
+    expect((await statusRows(db)).reconciliation.details).toMatchObject({ archiveEventsCreated: 2, temporalFallbackEvents: 1 });
     await worker.stop();
   });
 

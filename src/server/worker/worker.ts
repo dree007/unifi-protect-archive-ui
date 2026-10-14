@@ -65,7 +65,7 @@ export class WorkerStartupError extends Error {
 export async function runWorker(options: WorkerOptions): Promise<WorkerResult> {
   const { config, signal, logger = silentWorkerLogger, shutdownTimeoutMs = 25_000 } = options;
   const instanceId = options.instanceId ?? randomUUID();
-  // The database password may come from the URL or – as in compose.yaml – from PGPASSWORD.
+  // The database password may come from the URL or – as in docker-compose.yml – from PGPASSWORD.
   const secrets = [
     config.protect.mode === "enabled" ? config.protect.config.apiKey : undefined,
     passwordOf(config.databaseUrl),

@@ -3,7 +3,7 @@
 #   worker    node cli/worker-run.mjs               (background worker, no ports)
 #   migrate   node cli/migrate.mjs                  (one-shot schema migration)
 #   tools     node cli/archive-scan.mjs --dry-run, cli/media-check.mjs, …
-# Maintainer build input; end-user compose.yaml pulls a prebuilt image without a build. Contains no
+# Maintainer build input; end-user docker-compose.yml pulls a prebuilt image without a build. Contains no
 # configuration of a specific installation; everything comes from the environment at runtime.
 
 ARG NODE_IMAGE=node:24.21.0-bookworm-slim@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6
@@ -40,7 +40,7 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/* \
   && ffmpeg -version | head -n 1
 
-ARG RELEASE_VERSION=1.0.0
+ARG RELEASE_VERSION=1.0.1
 ARG SOURCE_URL=https://github.com/dree007/unifi-protect-archive-ui
 ARG SOURCE_REVISION=
 ARG SOURCE_DIGEST=
@@ -87,7 +87,7 @@ RUN mkdir -p /data/thumbnails /app/.next/cache \
 USER node
 EXPOSE 3000
 
-# Web role by default; compose.yaml sets its own checks per role.
+# Web role by default; docker-compose.yml sets its own checks per role.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
   CMD ["node", "-e", "fetch('http://127.0.0.1:' + (process.env.PORT || 3000) + '/api/health').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
 

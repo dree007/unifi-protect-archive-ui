@@ -7,8 +7,19 @@ import type { NativeValidation } from "./native-compliance.mts";
 export const REPOSITORY = "https://github.com/dree007/unifi-protect-archive-ui";
 export const REGISTRY_IMAGE = "ghcr.io/dree007/unifi-protect-archive-ui";
 export const PLATFORM = "linux/amd64";
+/**
+ * Accept header for registry manifest checks. Docker 29 (containerd image store) pushes an OCI image
+ * index, so the index/list types are required: without them a pushed tag is not found (pre-push
+ * check would miss an existing tag) and its digest cannot be verified after the push.
+ */
+export const MANIFEST_ACCEPT = [
+  "application/vnd.oci.image.index.v1+json",
+  "application/vnd.docker.distribution.manifest.list.v2+json",
+  "application/vnd.oci.image.manifest.v1+json",
+  "application/vnd.docker.distribution.manifest.v2+json",
+].join(", ");
 export const REQUIRED_RELEASE_CHECKS = [
-  "installation without source: only compose.yaml and .env, prebuilt image, automatic migrations",
+  "installation without source: only docker-compose.yml and .env, prebuilt image, automatic migrations",
   "host-default logging: all roles retain diagnostic stdout/stderr without Compose logging blocks",
   "web stops an active thumbnail request and real ffmpeg child within the default deadline",
   "worker stopped during blocked archiveScan: bounded exit, locks released, idempotent recovery",
@@ -40,11 +51,11 @@ export async function fileDigest(file: string) {
 }
 
 export function releaseVersion(value: string) {
-  if (!/^1\.0\.0(?:-rc\.[1-9]\d*)?$/.test(value)) throw new Error("Only 1.0.0 or a numbered 1.0.0 release candidate is prepared.");
+  if (!/^1\.0\.[01](?:-rc\.[1-9]\d*)?$/.test(value)) throw new Error("Only 1.0.0, 1.0.1 or one of their numbered release candidates is prepared.");
   return value;
 }
 
-/** Registry tag of a release: the exact validated version, so a candidate is never tagged as 1.0.0. */
+/** Registry tag of a release: the exact validated version, so a candidate is never tagged as its final version. */
 export function releaseImageTag(version: string) {
   return `${REGISTRY_IMAGE}:${releaseVersion(version)}`;
 }

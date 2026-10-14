@@ -1,5 +1,5 @@
 // Docker integration test of the self-hosted distribution (docs/selfhosting.md, docs/testing.md):
-// builds the real application image and runs compose.yaml exactly as a user would – plus a fake
+// builds the real application image and runs docker-compose.yml exactly as a user would – plus a fake
 // UniFi Protect console (compose.test.yaml) – against a temporary archive with synthetic videos.
 //
 //   node tests/docker/run.mts            all scenarios (~10 min), cleans up afterwards
@@ -174,7 +174,7 @@ class Stack {
   async prepare(): Promise<this> {
     await mkdir(this.dir, { recursive: true });
     await mkdir(this.archive, { recursive: true });
-    if (this.options.sourceFree) await copyFile(path.join(ROOT, "compose.yaml"), path.join(this.dir, "compose.yaml"));
+    if (this.options.sourceFree) await copyFile(path.join(ROOT, "docker-compose.yml"), path.join(this.dir, "docker-compose.yml"));
     this.port = await freePort();
     this.controlPort = await freePort();
     const env: Record<string, string> = {
@@ -208,7 +208,7 @@ class Stack {
   }
 
   composeArgs(): string[] {
-    const files = this.options.sourceFree ? ["-f", path.join(this.dir, "compose.yaml")] : ["-f", "compose.yaml", "-f", "tests/docker/compose.test.yaml", ...(this.options.overrides ?? []).flatMap((file) => ["-f", file])];
+    const files = this.options.sourceFree ? ["-f", path.join(this.dir, "docker-compose.yml")] : ["-f", "docker-compose.yml", "-f", "tests/docker/compose.test.yaml", ...(this.options.overrides ?? []).flatMap((file) => ["-f", file])];
     return ["compose", "-p", this.project, "--env-file", this.envFile, ...files];
   }
 
@@ -415,7 +415,7 @@ async function main() {
   // ------------------------------------------------------------------------------------------
   console.log("\n[configuration errors]");
   await check("missing POSTGRES_PASSWORD / NAS_ARCHIVE_HOST_PATH: compose refuses with a clear message", async () => {
-    const { code, out } = await sh("docker", ["compose", "-p", `unifi-archive-dockertest-${RUN_ID}-noenv`, "--env-file", "/dev/null", "-f", "compose.yaml", "config", "-q"], { allowFail: true });
+    const { code, out } = await sh("docker", ["compose", "-p", `unifi-archive-dockertest-${RUN_ID}-noenv`, "--env-file", "/dev/null", "-f", "docker-compose.yml", "config", "-q"], { allowFail: true });
     assert(code !== 0 && /Set POSTGRES_PASSWORD|Set NAS_ARCHIVE_HOST_PATH/.test(out), out);
     return "exit " + code;
   });
@@ -428,11 +428,11 @@ async function main() {
     ];
     for (const item of cases) {
       const env = { POSTGRES_PASSWORD: PASSWORD, NAS_ARCHIVE_HOST_PATH: WORK, ...item.env };
-      const config = JSON.parse((await sh("docker", ["compose", "-p", `unifi-archive-dockertest-${RUN_ID}-config`, "--env-file", "/dev/null", "-f", "compose.yaml", "config", "--format", "json"], { env })).out);
+      const config = JSON.parse((await sh("docker", ["compose", "-p", `unifi-archive-dockertest-${RUN_ID}-config`, "--env-file", "/dev/null", "-f", "docker-compose.yml", "config", "--format", "json"], { env })).out);
       for (const service of Object.values(config.services) as Record<string, unknown>[]) {
         for (const key of ["build", "init", "stop_grace_period", "logging"]) assert(!(key in service), `removed Compose option returned: ${key}`);
       }
-      assert(["web", "worker", "migrate"].every(name => config.services[name].image === "ghcr.io/dree007/unifi-protect-archive-ui:1.0.0"), "unexpected default GHCR image");
+      assert(["web", "worker", "migrate"].every(name => config.services[name].image === "ghcr.io/dree007/unifi-protect-archive-ui:1.0.1"), "unexpected default GHCR image");
       const ports = config.services.web.ports;
       assert(ports.length === 1 && ports[0].host_ip === item.ip && ports[0].target === 3000, "wrong web binding");
       assert(String(ports[0].published) === item.port, "wrong web port");
@@ -557,11 +557,11 @@ async function main() {
     return "URL-hostile password accepted; no credentials in logs";
   });
 
-  await check("installation without source: only compose.yaml and .env, prebuilt image, automatic migrations", async () => {
+  await check("installation without source: only docker-compose.yml and .env, prebuilt image, automatic migrations", async () => {
     const standalone = await new Stack({ label: "source-free", sourceFree: true, extraEnv: { PROTECT_COLLECTOR_ENABLED: "false" } }).prepare();
     stacks.push(standalone);
     await fillArchive(standalone.archive, source);
-    assert((await readdir(standalone.dir)).sort().join(",") === ".env,compose.yaml", "source-free installation includes source/build tooling");
+    assert((await readdir(standalone.dir)).sort().join(",") === ".env,docker-compose.yml", "source-free installation includes source/build tooling");
     await standalone.compose(["up", "-d", "--pull", "never"]);
     await waitFor("source-free web healthy", async () => (await fetch(standalone.url("/api/health"))).status === 200);
     await waitFor("source-free worker healthy", async () => (await standalone.containerState("worker")).health === "healthy");

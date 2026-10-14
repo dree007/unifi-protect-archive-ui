@@ -11,6 +11,7 @@ import {
   checkClusterLimits,
   clusterTemporalFallback,
   decideCrossCameraGrouping,
+  fallbackCameraKey,
   type ClipWithMetadata,
   type FallbackGroup,
 } from "@/server/matching/temporal-fallback";
@@ -133,7 +134,7 @@ describe("calculateTemporalClipFallbackMatch", () => {
     });
   });
 
-  it("9. never groups a clip without resolved camera", () => {
+  it("9. never groups a clip without camera identity", () => {
     expect(calculateTemporalClipFallbackMatch(clip(null, "13:00:00", "13:01:00"), clip("b", "13:00:00", "13:01:00"), config)).toMatchObject({
       isCandidate: false,
       reason: "unknownCamera",
@@ -141,6 +142,18 @@ describe("calculateTemporalClipFallbackMatch", () => {
     expect(calculateTemporalClipFallbackMatch(clip("a", "13:00:00", "13:01:00"), clip(null, "13:00:00", "13:01:00"), config).reason).toBe(
       "unknownCamera",
     );
+  });
+
+  it("9b. identifies an unresolved clip by its file-name camera, apart from camera IDs", () => {
+    expect(fallbackCameraKey({ cameraId: "cam-1", cameraName: "Einfahrt" })).toBe("cam-1");
+    expect(fallbackCameraKey({ cameraId: null, cameraName: "Einfahrt" })).toBe("name:Einfahrt");
+    expect(fallbackCameraKey({ cameraId: null, cameraName: "Einfahrt" })).not.toBe(fallbackCameraKey({ cameraId: null, cameraName: "Klingel" }));
+    const [einfahrt, klingel] = [
+      clip(fallbackCameraKey({ cameraId: null, cameraName: "Einfahrt" }), "13:01:05", "13:02:18"),
+      clip(fallbackCameraKey({ cameraId: null, cameraName: "Klingel" }), "13:01:04", "13:02:18"),
+    ];
+    expect(calculateTemporalClipFallbackMatch(einfahrt, klingel, config).reason).toBe("matched");
+    expect(calculateTemporalClipFallbackMatch(einfahrt, { ...einfahrt, id: "other" }, config).reason).toBe("sameCamera");
   });
 
   it("10. rejects invalid intervals (end before or at start, invalid dates)", () => {

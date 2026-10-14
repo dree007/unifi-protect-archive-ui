@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.0.1
+
+Patch release.
+
+### Changed
+
+- The production Compose file is now `docker-compose.yml` (formerly `compose.yaml`). Existing
+  installations keep working; to switch, replace the local `compose.yaml` with the new file. Do not keep both, because Docker
+  Compose prefers `compose.yaml`. The project name and volumes are unchanged.
+- `.env.example` lists only the common settings. Advanced settings (worker intervals, NAS mount
+  checks, database name/user, thumbnail concurrency) remain supported and are documented in
+  `docs/selfhosting.md`; local development values moved to `docs/testing.md`.
+
+### Fixed
+
+- Release publishing verifies the pushed tag with image index media types, so the post-push
+  digest check no longer fails for images pushed as an OCI index (Docker 29).
+- Temporal fallback grouping now also works without any Protect connection: clips whose camera is
+  not resolved take part under the camera name from their file name. Previously, a NAS-only
+  installation never grouped simultaneous clips of different cameras.
+
 ## 1.0.0
 
 First public self-hosted release.

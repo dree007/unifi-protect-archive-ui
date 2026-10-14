@@ -2,7 +2,7 @@
 //
 //   npm run db:migrate                 locally (tsx)
 //   node cli/migrate.mjs               in the production image – the one-shot `migrate` service
-//                                      of compose.yaml runs it before web and worker start
+//                                      of docker-compose.yml runs it before web and worker start
 //
 // Waits up to ~60 s for the database. Never resets or drops anything.
 // Exit codes: 0 schema current, 1 migration failed or database unreachable (nothing half
@@ -28,7 +28,7 @@ try {
   process.exit(2);
 }
 
-// Never print DATABASE_URL credentials or PGPASSWORD (compose.yaml passes the password that way).
+// Never print DATABASE_URL credentials or PGPASSWORD (docker-compose.yml passes the password that way).
 const secrets = [process.env.PGPASSWORD, passwordOf(databaseUrl)];
 const clean = (error: unknown) => sanitizeStatusMessage(describeError(error), { secrets });
 

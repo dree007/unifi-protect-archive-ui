@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 /**
  * Browser test of the self-hosted Docker installation: the real production image, started by
- * compose.yaml, filled by the real worker (NAS scan, Protect events, reconciliation) – nothing
+ * docker-compose.yml, filled by the real worker (NAS scan, Protect events, reconciliation) – nothing
  * prepared in the database. Runs only with E2E_BASE_URL (playwright.config.ts), e.g. against
  * the stack kept by `KEEP=1 node tests/docker/run.mts` (docs/testing.md).
  *

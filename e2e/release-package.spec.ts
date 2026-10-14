@@ -7,7 +7,7 @@ for (const locale of ["de-DE", "en-GB"]) {
       const page = await context.newPage();
       await page.goto("/");
       const footer = page.locator("footer");
-      await expect(footer).toContainText("Version 1.0.0");
+      await expect(footer).toContainText("Version 1.0.1");
       await expect(footer.getByRole("link", { name: locale === "de-DE" ? "Lizenz (AGPL-3.0-only)" : "License (AGPL-3.0-only)", exact: true })).toHaveAttribute("href", "/notices/LICENSE.txt");
       await expect(footer.getByRole("link", { name: locale === "de-DE" ? "Drittanbieter-Hinweise" : "Third-party notices", exact: true })).toHaveAttribute("href", "/notices/THIRD_PARTY_NOTICES.md");
       await expect(footer.getByRole("link", { name: locale === "de-DE" ? "Quellcode" : "Source code", exact: true })).toHaveAttribute("href", "https://source.example.invalid/releases/1.0.0");

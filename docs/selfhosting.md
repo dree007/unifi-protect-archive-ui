@@ -22,8 +22,8 @@ in the containers and do not need to be installed on the host.
 # Check the SERVER Engine version, not just the Docker client version.
 docker version --format '{{.Server.Version}}'
 docker compose version
-curl -fsSLO https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.0.0/compose.yaml
-curl -fsSL -o .env https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.0.0/.env.example
+curl -fsSLO https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.0.1/docker-compose.yml
+curl -fsSL -o .env https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.0.1/.env.example
 chmod 600 .env
 # Edit .env: set POSTGRES_PASSWORD and NAS_ARCHIVE_HOST_PATH.
 docker compose up -d
@@ -34,7 +34,7 @@ Open **http://<docker-host-ip>:3100** from a permitted LAN device. No extra bind
 SSH tunnel, proxy, DNS entry or router forwarding is required in the default LAN mode.
 Protect is optional: leave its settings empty for NAS-only use.
 The first startup pulls the ready-made image, creates the schema and starts indexing; no demo data is inserted.
-The default image is `ghcr.io/dree007/unifi-protect-archive-ui:1.0.0`, Linux amd64. It is pulled
+The default image is `ghcr.io/dree007/unifi-protect-archive-ui:1.0.1`, Linux amd64. It is pulled
 anonymously; no registry account, source tree or local compilation is needed.
 `migrate` exiting with code **0** is normal.
 
@@ -75,15 +75,14 @@ PostgreSQL, worker and migrate still publish no ports; NAS originals remain read
 
 ## Configuration
 
-[.env.example](../.env.example) is the configuration reference. Docker Compose reads `.env`;
+[.env.example](../.env.example) lists the common settings. Docker Compose reads `.env`;
 local development CLI commands use `.env.local`. Do not copy real secrets into images or Git.
-Empty optional values use the defaults below.
+Empty or missing optional values use the defaults below.
 
 | Variable | Default | Purpose |
 |---|---|---|
 | `POSTGRES_PASSWORD` | required | Set a strong password before the first start |
 | `NAS_ARCHIVE_HOST_PATH` | required | Existing archive directory on this host |
-| `POSTGRES_DB`, `POSTGRES_USER` | `unifi_archive` | Database and user; set before the first start |
 | `UNIFI_ARCHIVE_BIND_IP` | `0.0.0.0` | All IPv4 host interfaces; optionally loopback or a specific host IPv4 address |
 | `UNIFI_ARCHIVE_PORT` | `3100` | Published web port on the configured host IP |
 | `APP_TIME_ZONE` | `Europe/Berlin` | Display and calendar boundaries (IANA name) |
@@ -91,6 +90,12 @@ Empty optional values use the defaults below.
 | `PROTECT_COLLECTOR_ENABLED` | `auto` | `false`: off; `true`: require settings; `auto`: use if configured |
 | `UNIFI_PROTECT_URL`, `UNIFI_PROTECT_API_KEY` | empty | Optional Protect console URL and Integration API key |
 | `UNIFI_PROTECT_TLS_VERIFY` | `true` | `false` accepts Protect's self-signed certificate only |
+
+Advanced settings are not in `.env.example`. Add them to `.env` only when you need them:
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `POSTGRES_DB`, `POSTGRES_USER` | `unifi_archive` | Database and user; set before the first start |
 | `ARCHIVE_SCAN_INTERVAL_MINUTES` | `15` | Pause after each full NAS scan |
 | `ARCHIVE_RECONCILE_INTERVAL_MINUTES` | `5` | Pause after reconciliation; also runs after scans |
 | `WORKER_HEARTBEAT_INTERVAL_SECONDS` | `30` | Worker heartbeat |
@@ -231,7 +236,7 @@ SQL changes and migration records are rolled back. No schema resets;
 web/worker do not run competing migrations. An older image is refused when the schema is newer.
 
 ```bash
-# Back up first, then select the reviewed version in compose.yaml or UNIFI_ARCHIVE_IMAGE.
+# Back up first, then select the reviewed version in docker-compose.yml or UNIFI_ARCHIVE_IMAGE.
 # Never replace an existing version tag with different content.
 docker compose pull
 # Stop the old application before changing its schema.

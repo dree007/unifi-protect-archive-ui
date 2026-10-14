@@ -8,7 +8,7 @@ import lock from "../../package-lock.json";
 
 describe("release package", () => {
   it("keeps package, lock and image version/license metadata consistent", () => {
-    expect(packageMetadata.version).toBe("1.0.0");
+    expect(packageMetadata.version).toBe("1.0.1");
     expect(packageMetadata.license).toBe("AGPL-3.0-only");
     expect(lock.version).toBe(packageMetadata.version);
     expect(lock.packages[""].version).toBe(packageMetadata.version);

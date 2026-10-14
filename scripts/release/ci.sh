@@ -3,11 +3,11 @@
 set -eu
 operation="${1:?Use build, compliance or publish}"
 case "$operation" in build|compliance|publish) ;; *) exit 2 ;; esac
-# Release jobs run only for a protected version tag (v1.0.0 or v1.0.0-rc.N), independent of the
+# Release jobs run only for a protected version tag (v1.0.0, v1.0.1 or their -rc.N), independent of the
 # CI rules; the version is always taken from that tag.
 tag="${CI_COMMIT_TAG:-}"
-{ [ "$tag" = v1.0.0 ] || expr "x$tag" : 'xv1\.0\.0-rc\.[1-9][0-9]*$' >/dev/null; } && [ "${CI_COMMIT_REF_PROTECTED:-}" = true ] \
-  || { echo "Release jobs run only for a protected v1.0.0 or v1.0.0-rc.N tag." >&2; exit 2; }
+{ [ "$tag" = v1.0.0 ] || [ "$tag" = v1.0.1 ] || expr "x$tag" : 'xv1\.0\.[01]-rc\.[1-9][0-9]*$' >/dev/null; } && [ "${CI_COMMIT_REF_PROTECTED:-}" = true ] \
+  || { echo "Release jobs run only for a protected v1.0.0, v1.0.1 or matching -rc.N tag." >&2; exit 2; }
 prefix="unifi-release-ci-${CI_JOB_ID:?}"
 runner="${prefix}-runner"
 volume="${prefix}-workspace"

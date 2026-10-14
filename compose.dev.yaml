@@ -1,4 +1,4 @@
-# Local development only – not a production setup (that is compose.yaml, docs/selfhosting.md).
+# Local development only – not a production setup (that is docker-compose.yml, docs/selfhosting.md).
 # Always pass this file explicitly, e.g.:
 #   docker compose -f compose.dev.yaml up -d postgres
 # Values can be overridden via environment variables or a `.env` file next to this file

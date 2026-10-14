@@ -44,7 +44,7 @@ describe("public documentation", () => {
 
 describe("public source", () => {
   it("never points to private release records", () => {
-    const files = execFileSync("git", ["ls-files", "-co", "--exclude-standard", "src", "scripts", "e2e", ".gitlab-ci.yml", "Dockerfile", "compose.yaml"], { encoding: "utf8" })
+    const files = execFileSync("git", ["ls-files", "-co", "--exclude-standard", "src", "scripts", "e2e", ".gitlab-ci.yml", "Dockerfile", "docker-compose.yml"], { encoding: "utf8" })
       .split("\n").filter((file) => file && isPublicPath(file) && file !== "scripts/publication-policy.json");
     expect(files.length).toBeGreaterThan(50);
     expect(files.filter((file) => read(file).includes("docs/release/"))).toEqual([]);
@@ -65,10 +65,10 @@ describe("README", () => {
   });
 
   it("installs the released version with the settings that .env.example defines", () => {
-    for (const file of ["compose.yaml", ".env.example"]) {
+    for (const file of ["docker-compose.yml", ".env.example"]) {
       expect(readme).toContain(`https://raw.githubusercontent.com/${REPOSITORY.replace("https://github.com/", "")}/v${version}/${file}`);
     }
-    expect(read("compose.yaml")).toContain(`\${UNIFI_ARCHIVE_IMAGE:-${REGISTRY_IMAGE}:${version}}`);
+    expect(read("docker-compose.yml")).toContain(`\${UNIFI_ARCHIVE_IMAGE:-${REGISTRY_IMAGE}:${version}}`);
     const env = read(".env.example");
     for (const key of ["POSTGRES_PASSWORD", "NAS_ARCHIVE_HOST_PATH"]) {
       expect(readme).toContain(key);

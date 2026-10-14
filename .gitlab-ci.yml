@@ -21,7 +21,7 @@ stages: [install, check, build, container-test, release-build, release-complianc
 # Pipelines for merge requests and branches, without duplicates while an MR is open.
 workflow:
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^v1\.0\.0(-rc\.[1-9][0-9]*)?$/ && $CI_COMMIT_REF_PROTECTED == "true"'
+    - if: '$CI_COMMIT_TAG =~ /^v1\.0\.[01](-rc\.[1-9][0-9]*)?$/ && $CI_COMMIT_REF_PROTECTED == "true"'
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
       when: never
@@ -173,7 +173,7 @@ release-build:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^v1\.0\.0(-rc\.[1-9][0-9]*)?$/ && $CI_COMMIT_REF_PROTECTED == "true"'
+    - if: '$CI_COMMIT_TAG =~ /^v1\.0\.[01](-rc\.[1-9][0-9]*)?$/ && $CI_COMMIT_REF_PROTECTED == "true"'
     - when: never
   script:
     - docker info
@@ -212,7 +212,7 @@ native-compliance:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^v1\.0\.0(-rc\.[1-9][0-9]*)?$/ && $CI_COMMIT_REF_PROTECTED == "true"'
+    - if: '$CI_COMMIT_TAG =~ /^v1\.0\.[01](-rc\.[1-9][0-9]*)?$/ && $CI_COMMIT_REF_PROTECTED == "true"'
     - when: never
   script:
     - sh scripts/release/ci.sh compliance
@@ -250,7 +250,7 @@ ghcr-publish:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^v1\.0\.0(-rc\.[1-9][0-9]*)?$/ && $CI_COMMIT_REF_PROTECTED == "true"'
+    - if: '$CI_COMMIT_TAG =~ /^v1\.0\.[01](-rc\.[1-9][0-9]*)?$/ && $CI_COMMIT_REF_PROTECTED == "true"'
       when: manual
       allow_failure: false
     - when: never

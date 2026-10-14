@@ -3,7 +3,7 @@ import { sql } from "drizzle-orm";
 import { getDb } from "@/server/db/client";
 
 /**
- * Health of the web server for the container health check (compose.yaml, docs/selfhosting.md):
+ * Health of the web server for the container health check (docker-compose.yml, docs/selfhosting.md):
  * 200 when the server answers and the database accepts a trivial query, 503 otherwise. Loads no
  * archive data, reveals no configuration; route handlers are never cached.
  */

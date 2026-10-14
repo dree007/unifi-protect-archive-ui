@@ -22,10 +22,23 @@ export type TemporalFallbackConfig = Pick<
 
 export interface FallbackClip {
   id: string;
-  /** Resolved camera; `null` if the file-name camera could not be resolved unambiguously. */
+  /**
+   * Camera identity for the fallback, see {@link fallbackCameraKey}; `null` means unknown and
+   * never groups.
+   */
   cameraId: string | null;
   startAt: Date;
   endAt: Date;
+}
+
+/**
+ * Camera identity of a clip for the fallback: the resolved camera, else the camera name from the
+ * file name (`name:<name>`). The fallback therefore also works without any Protect connection.
+ * Names are compared exactly (the parser already NFC-normalizes and trims them); the prefix keeps
+ * them apart from camera IDs. Same SQL in `findTemporalFallbackCandidates`.
+ */
+export function fallbackCameraKey(clip: { cameraId: string | null; cameraName: string }): string {
+  return clip.cameraId ?? `name:${clip.cameraName}`;
 }
 
 export type TemporalFallbackReason =
@@ -57,7 +70,7 @@ const validInterval = (clip: FallbackClip) => {
 };
 
 /**
- * Time rule of the fallback for two clips: different, known cameras; valid intervals; starts at
+ * Time rule of the fallback for two clips: different camera identities; valid intervals; starts at
  * most `temporalFallbackStartToleranceMs` apart, ends at most `temporalFallbackEndToleranceMs`
  * apart, and an intersection over union of at least `temporalFallbackMinIou`.
  * Metadata is not looked at here (see {@link decideCrossCameraGrouping}).
