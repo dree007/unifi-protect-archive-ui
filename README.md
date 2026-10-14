@@ -29,8 +29,8 @@ Everything else (database, ffmpeg, Node.js) is included in the containers.
 
 ```bash
 mkdir unifi-archive && cd unifi-archive
-curl -fsSLO https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.0.0/compose.yaml
-curl -fsSL -o .env https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.0.0/.env.example
+curl -fsSLO https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.0.1/docker-compose.yaml
+curl -fsSL -o .env https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.0.1/.env.example
 chmod 600 .env
 ```
 
