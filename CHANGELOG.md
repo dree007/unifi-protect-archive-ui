@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- The public GitHub repository contains only what is needed to run and rebuild the application:
+  tests, CI configuration, development tooling and developer documentation stay in the private
+  development repository.
+
 ## 1.0.1
 
 Patch release.

@@ -332,8 +332,8 @@ container for media checks. Concurrent jobs are coordinated by existing advisory
 
 ## Validation and resource observations
 
-See the [testing guide](testing.md) for reproducible checks. Resource samples are workload-specific;
-no universal CPU/RAM minimum is claimed. Allow space for the image, database and growing cache.
+Resource samples are workload-specific; no universal CPU/RAM minimum is claimed. Allow space for
+the image, database and growing cache.
 The image has been tested on Linux amd64; other architectures and real NAS mount propagation
 require their own verification.
 

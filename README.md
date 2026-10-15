@@ -13,7 +13,7 @@ This is an independent project. It is not affiliated with or supported by Ubiqui
 - One place to browse and search your archived recordings by camera, date and detection type.
 - Video playback with seeking, plus preview images.
 - An optional connection to your UniFi Protect console for camera names and detection events.
-- Clips from the same situation but from different cameras are automatically aggregated and displayed as one. Clips can then be viewed independently (in v1.0.0 this only works in case there has been a connection to the Protect server at least once to fetch the camera names)
+- Clips from the same situation but from different cameras are automatically aggregated and displayed as one. Clips can then be viewed independently (since v1.0.1 also without a connection to the Protect server, based on the camera names in the file names)
 
 <img width="1564" height="1006" alt="Pixeliertes Sicherheitskamera-Archiv-Dashboard" src="https://github.com/user-attachments/assets/bba42823-5c21-4294-bd13-4e26cc3883d4" />
 
@@ -46,7 +46,8 @@ docker compose up -d
 ```
 
 Open `http://<your-server-ip>:3100` in your browser. The app starts indexing your recordings
-right away. All settings are explained in [.env.example](.env.example).
+right away. The common settings are explained in [.env.example](.env.example), advanced ones in
+[docs/selfhosting.md](docs/selfhosting.md#configuration).
 
 ## Keep it private
 
@@ -59,13 +60,11 @@ Read [SECURITY.md](SECURITY.md) before you install.
 
 - [Self-hosting guide](docs/selfhosting.md): installation, configuration, updates, backups and troubleshooting
 - [Access security](docs/security.md): network access, reverse proxy and login gateways
-- [NAS indexing](docs/nas-indexer.md) and [UniFi Protect connection](docs/protect-integration.md)
-- [Testing](docs/testing.md): running the test suites for development
 - [Changelog](CHANGELOG.md)
 
 ## Support
 
-Version 1.0.0 is built and tested for Linux amd64 with synthetic recordings and a simulated
+Version 1.0.1 is built and tested for Linux amd64 with synthetic recordings and a simulated
 Protect console. Real NAS setups, Protect versions, HTTPS proxies and single sign-on vary and are
 not individually tested.
 
