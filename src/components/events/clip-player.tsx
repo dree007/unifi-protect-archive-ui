@@ -2,11 +2,14 @@
 
 import { useI18n } from "@/i18n/provider";
 import { useCallback, useId, useRef, useState, type KeyboardEvent } from "react";
-import { VideoOff } from "lucide-react";
+import { Columns2, VideoOff } from "lucide-react";
 import { cn } from "cn";
 
 import { ClipThumbnail } from "@/components/events/clip-thumbnail";
+import { PlayTogether } from "@/components/events/play-together";
+import { FAILURE_TEXT, releaseVideo, restoreSource, videoFailure } from "@/components/events/video-element";
 import { VideoPreview } from "@/components/events/video-preview";
+import { Button } from "@/components/ui/button";
 import { formatDuration } from "@/lib/format";
 import type { ClipModel } from "@/lib/view-models";
 
@@ -20,6 +23,8 @@ interface ClipPlayerProps {
    * existing card (desktop side panel) – no card in a card.
    */
   framed?: boolean;
+  /** App time zone for the clock times of the shared playback. */
+  timeZone: string;
 }
 
 /**
@@ -27,10 +32,14 @@ interface ClipPlayerProps {
  * (several cameras, or several clips of one camera). Only the selected clip has a `<video>`
  * element; switching remounts it, which stops the previous one. No autoplay, metadata only
  * until the user presses play; the thumbnail is the poster.
+ *
+ * With two or more clips, "Gemeinsam abspielen" opens the synchronized playback of two of them.
+ * Meanwhile this player shows only the poster, so never more than two videos exist.
  */
-export function ClipPlayer({ clips, cameraName, pending, framed = false }: ClipPlayerProps) {
+export function ClipPlayer({ clips, cameraName, pending, framed = false, timeZone }: ClipPlayerProps) {
   const { t, locale } = useI18n();
   const [selectedId, setSelectedId] = useState(clips[0]?.id);
+  const [together, setTogether] = useState(false);
   const selected = clips.find((clip) => clip.id === selectedId) ?? clips[0];
   const baseId = useId();
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -64,8 +73,24 @@ export function ClipPlayer({ clips, cameraName, pending, framed = false }: ClipP
           framed ? "rounded-[calc(var(--radius-card)-0.5rem)] sm:rounded-[calc(var(--radius-card)-0.625rem)]" : "rounded-[var(--radius-inner)]",
         )}
       >
-        <ClipVideo key={selected.id} clip={selected} />
+        {together ? (
+          <div className="relative aspect-video">
+            <ClipThumbnail src={selected.thumbnailUrl} />
+          </div>
+        ) : (
+          <ClipVideo key={selected.id} clip={selected} />
+        )}
       </div>
+
+      {clips.length > 1 && (
+        <>
+          <Button variant="secondary" size="lg" className={cn("self-center", framed && "mt-0.5")} onClick={() => setTogether(true)}>
+            <Columns2 data-icon="inline-start" aria-hidden />
+            {t("together.open")}
+          </Button>
+          <PlayTogether clips={clips} timeZone={timeZone} open={together} onOpenChange={setTogether} />
+        </>
+      )}
 
       {clips.length > 1 && (
         <div
@@ -113,36 +138,25 @@ export function ClipPlayer({ clips, cameraName, pending, framed = false }: ClipP
   );
 }
 
-const FAILURE_TEXT = {
-  unavailable: {
-    title: "errors.videoUnavailable",
-    text: "errors.videoUnavailableBody",
-  },
-  unsupported: {
-    title: "errors.videoUnsupported",
-    text: "errors.videoUnsupportedBody",
-  },
-} as const;
-
 function ClipVideo({ clip }: { clip: ClipModel }) {
   const { t } = useI18n();
   const [state, setState] = useState<"loading" | "ready" | keyof typeof FAILURE_TEXT>("loading");
 
-  // A media error does not say why. If the endpoint still answers HEAD with 200, the file is
-  // there and the browser cannot decode it; otherwise the file (or archive) is unavailable.
   const onFailure = useCallback(() => {
-    fetch(clip.videoUrl, { method: "HEAD" })
-      .then((response) => setState(response.ok ? "unsupported" : "unavailable"))
-      .catch(() => setState("unavailable"));
+    void videoFailure(clip.videoUrl).then(setState);
   }, [clip.videoUrl]);
 
-  // The server-rendered element may have loaded metadata or failed before hydration.
+  // The server-rendered element may have loaded metadata or failed before hydration. On
+  // unmount (other clip, shared playback opened, page left) the video is released.
   const checkState = useCallback(
     (video: HTMLVideoElement | null) => {
-      if (video?.error) onFailure();
-      else if (video && video.readyState >= HTMLMediaElement.HAVE_METADATA) setState("ready");
+      if (!video) return;
+      restoreSource(video, clip.videoUrl);
+      if (video.error) onFailure();
+      else if (video.readyState >= HTMLMediaElement.HAVE_METADATA) setState("ready");
+      return () => releaseVideo(video);
     },
-    [onFailure],
+    [onFailure, clip.videoUrl],
   );
 
   if (state === "unavailable" || state === "unsupported") {

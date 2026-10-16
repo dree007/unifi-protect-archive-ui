@@ -327,5 +327,17 @@
   "legal.license": "Lizenz (AGPL-3.0-only)",
   "legal.thirdParty": "Drittanbieter-Hinweise",
   "legal.source": "Quellcode",
-  "legal.sourcePending": "Quellcode-Veröffentlichung ausstehend"
+  "legal.sourcePending": "Quellcode-Veröffentlichung ausstehend",
+  "together.open": "Gemeinsam abspielen",
+  "together.description": "Zwei Aufnahmen nebeneinander, synchron nach Aufnahmezeit.",
+  "together.play": "Abspielen",
+  "together.pause": "Pausieren",
+  "together.position": "Gemeinsame Zeitposition",
+  "together.startsAt": "Beginnt um {time}",
+  "together.endedAt": "Beendet um {time}",
+  "together.loading": "Video wird geladen",
+  "together.audioOn": "Ton von {label} einschalten",
+  "together.audioOff": "Ton von {label} ausschalten",
+  "together.audioBlocked": "Der Browser hat den Ton blockiert – die Wiedergabe läuft stumm weiter.",
+  "together.choose": "Aufnahme für Ansicht {slot} wählen"
 }

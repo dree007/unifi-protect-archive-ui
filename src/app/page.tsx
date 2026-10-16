@@ -8,10 +8,9 @@ import { SectionCard } from "@/components/common/section-card";
 import { StatCard } from "@/components/common/stat-card";
 import { DetectionDistribution } from "@/components/dashboard/detection-distribution";
 import { LatestDetectionCard } from "@/components/dashboard/latest-detection-card";
-import { EventCard } from "@/components/events/event-card";
+import { RecentEvents } from "@/components/dashboard/recent-events";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
-import { eventHref } from "@/lib/archive-filters";
 import { formatBytes, formatNumber } from "@/lib/format";
 import { queryContext } from "@/server/queries/context";
 import { getDashboard } from "@/server/queries/dashboard";
@@ -66,17 +65,7 @@ export default async function DashboardPage() {
                   </Link>
                 </Button>
               </div>
-              {dashboard.recentEvents.length === 0 ? (
-                <p className="surface-card p-5 text-sm text-muted-foreground">{t("dashboard.noEvents")}</p>
-              ) : (
-                <ul className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  {dashboard.recentEvents.map((event) => (
-                    <li key={event.id}>
-                      <EventCard event={event} href={eventHref(event.id)} showDate className="h-full" />
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <RecentEvents events={dashboard.recentEvents} />
             </section>
 
             <SectionCard title={t("common.detections")} description={t("dashboard.byType")}>

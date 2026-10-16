@@ -22,8 +22,8 @@ in the containers and do not need to be installed on the host.
 # Check the SERVER Engine version, not just the Docker client version.
 docker version --format '{{.Server.Version}}'
 docker compose version
-curl -fsSLO https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.0.1/docker-compose.yml
-curl -fsSL -o .env https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.0.1/.env.example
+curl -fsSLO https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.1.0/docker-compose.yml
+curl -fsSL -o .env https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.1.0/.env.example
 chmod 600 .env
 # Edit .env: set POSTGRES_PASSWORD and NAS_ARCHIVE_HOST_PATH.
 docker compose up -d
@@ -34,7 +34,7 @@ Open **http://<docker-host-ip>:3100** from a permitted LAN device. No extra bind
 SSH tunnel, proxy, DNS entry or router forwarding is required in the default LAN mode.
 Protect is optional: leave its settings empty for NAS-only use.
 The first startup pulls the ready-made image, creates the schema and starts indexing; no demo data is inserted.
-The default image is `ghcr.io/dree007/unifi-protect-archive-ui:1.0.1`, Linux amd64. It is pulled
+The default image is `ghcr.io/dree007/unifi-protect-archive-ui:1.1.0`, Linux amd64. It is pulled
 anonymously; no registry account, source tree or local compilation is needed.
 `migrate` exiting with code **0** is normal.
 

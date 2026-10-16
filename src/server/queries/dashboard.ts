@@ -8,7 +8,7 @@ import { formatRelative } from "@/lib/format";
 import { addDays, dayKeyInZone, startOfDayInZone } from "@/lib/time-zone";
 import type { DashboardModel } from "@/lib/view-models";
 
-import { getArchivePage, toCards } from "./archive";
+import { getArchivePage, shownInOverview, toCards } from "./archive";
 import { toDate, toDateOrNull, type QueryContext } from "./context";
 
 const RECENT_EVENTS = 5;
@@ -16,6 +16,8 @@ const DETECTION_DAYS = 7;
 
 export async function getDashboard(context: QueryContext): Promise<DashboardModel> {
   const { db, now, timeZone, format } = context;
+  // Event figures follow the event list: pending events past their grace period are left out.
+  const shown = shownInOverview(now);
   const today = dayKeyInZone(now, timeZone);
   const todayStart = startOfDayInZone(today, timeZone);
   const tomorrowStart = startOfDayInZone(addDays(today, 1), timeZone);
@@ -31,8 +33,9 @@ export async function getDashboard(context: QueryContext): Promise<DashboardMode
     protect_events_total: number;
   }>(sql`
     select
-      (select count(*)::int from archive_events
-        where start_at >= ${todayStart.toISOString()}::timestamptz and start_at < ${tomorrowStart.toISOString()}::timestamptz) as events_today,
+      (select count(*)::int from archive_events e
+        where e.start_at >= ${todayStart.toISOString()}::timestamptz and e.start_at < ${tomorrowStart.toISOString()}::timestamptz
+          and ${shown}) as events_today,
       (select count(*)::int from archived_clips) as clips_total,
       (select coalesce(sum(file_size_bytes), 0) from archived_clips) as archive_size,
       (select count(*)::int from cameras) as cameras_total,
@@ -47,6 +50,7 @@ export async function getDashboard(context: QueryContext): Promise<DashboardMode
     where exists (
       select 1 from archive_event_protect_events l join protect_events p on p.id = l.protect_event_id
       where l.archive_event_id = e.id and cardinality(p.smart_detect_types) > 0)
+      and ${shown}
     order by e.start_at desc, e.id desc limit 1`);
   let latestDetection: DashboardModel["latestDetection"] = null;
   if (latest.rows[0]) {
@@ -74,7 +78,7 @@ export async function getDashboard(context: QueryContext): Promise<DashboardMode
     join archive_event_protect_events l on l.archive_event_id = e.id
     join protect_events p on p.id = l.protect_event_id
     cross join unnest(p.smart_detect_types) as t
-    where e.start_at >= ${detectionsSince.toISOString()}::timestamptz
+    where e.start_at >= ${detectionsSince.toISOString()}::timestamptz and ${shown}
     group by t order by count desc, t`);
 
   const recent = await getArchivePage(DEFAULT_ARCHIVE_FILTERS, null, context, RECENT_EVENTS);

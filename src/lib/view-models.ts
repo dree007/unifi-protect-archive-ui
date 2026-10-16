@@ -85,6 +85,9 @@ export interface ClipModel {
   fileSizeBytes: number | null;
   startLabel: string;
   endLabel: string;
+  /** Recording start/end from the file name (ISO 8601), for synchronized playback. */
+  start: string;
+  end: string;
   durationSeconds: number;
   /** `/api/clips/<id>/video` */
   videoUrl: string;

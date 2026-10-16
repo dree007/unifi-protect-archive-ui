@@ -40,7 +40,7 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/* \
   && ffmpeg -version | head -n 1
 
-ARG RELEASE_VERSION=1.0.1
+ARG RELEASE_VERSION=1.1.0
 ARG SOURCE_URL=https://github.com/dree007/unifi-protect-archive-ui
 ARG SOURCE_REVISION=
 ARG SOURCE_DIGEST=

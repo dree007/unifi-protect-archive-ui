@@ -12,6 +12,7 @@ This is an independent project. It is not affiliated with or supported by Ubiqui
 
 - One place to browse and search your archived recordings by camera, date and detection type.
 - Video playback with seeking, plus preview images.
+- Play two clips of an event side by side, synchronized by recording time (since v1.1.0).
 - An optional connection to your UniFi Protect console for camera names and detection events.
 - Clips from the same situation but from different cameras are automatically aggregated and displayed as one. Clips can then be viewed independently (since v1.0.1 also without a connection to the Protect server, based on the camera names in the file names)
 
@@ -29,8 +30,8 @@ Everything else (database, ffmpeg, Node.js) is included in the containers.
 
 ```bash
 mkdir unifi-archive && cd unifi-archive
-curl -fsSLO https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.0.1/docker-compose.yml
-curl -fsSL -o .env https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.0.1/.env.example
+curl -fsSLO https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.1.0/docker-compose.yml
+curl -fsSL -o .env https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.1.0/.env.example
 chmod 600 .env
 ```
 
@@ -64,7 +65,7 @@ Read [SECURITY.md](SECURITY.md) before you install.
 
 ## Support
 
-Version 1.0.1 is built and tested for Linux amd64 with synthetic recordings and a simulated
+Version 1.1.0 is built and tested for Linux amd64 with synthetic recordings and a simulated
 Protect console. Real NAS setups, Protect versions, HTTPS proxies and single sign-on vary and are
 not individually tested.
 

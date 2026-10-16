@@ -3,7 +3,7 @@
 The application is AGPL-3.0-only. Node, Debian packages, fonts and other dependencies keep
 their own terms. Each release attaches the matching `source.tar.gz` (application) and
 `native-source.tar.gz` (third-party material) to its GitHub release, for example
-`https://github.com/dree007/unifi-protect-archive-ui/releases/tag/v1.0.1`. A registry image ID, registry digest and source checksum are
+`https://github.com/dree007/unifi-protect-archive-ui/releases/tag/v1.1.0`. A registry image ID, registry digest and source checksum are
 different identities; the release manifest records them separately.
 
 The native bundle contains exact Debian descriptors, original/patch archives, build files,

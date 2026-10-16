@@ -14,6 +14,7 @@ import { EventDetail } from "@/components/events/event-detail";
 import { EventTimeline } from "@/components/events/event-timeline";
 import { Button } from "@/components/ui/button";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { useShownEvents } from "@/hooks/use-shown-events";
 import {
   archiveHref,
   DEFAULT_ARCHIVE_FILTERS,
@@ -138,7 +139,9 @@ function ArchiveResults({
   onReset: () => void;
 }) {
   const { t } = useI18n();
-  const [events, setEvents] = useState<EventCardModel[]>(firstPage.events);
+  const [loaded, setLoaded] = useState<EventCardModel[]>(firstPage.events);
+  // Pending events leave the open list when their grace period ends (src/lib/pending-clip.ts).
+  const events = useShownEvents(loaded);
   const [nextCursor, setNextCursor] = useState(firstPage.nextCursor);
   const [loadingMore, setLoadingMore] = useState(false);
   const [loadError, setLoadError] = useState(false);
@@ -153,7 +156,7 @@ function ArchiveResults({
     setLoadError(false);
     try {
       const page = await loadMoreArchiveEvents(serializeArchiveFilters(filters).toString(), nextCursor);
-      setEvents((current) => {
+      setLoaded((current) => {
         const known = new Set(current.map((event) => event.id));
         return [...current, ...page.events.filter((event) => !known.has(event.id))];
       });
@@ -165,7 +168,7 @@ function ArchiveResults({
     }
   };
 
-  if (events.length === 0) {
+  if (events.length === 0 && !nextCursor) {
     if (rangeIssue === "from-after-to") {
       return (
         <EmptyState

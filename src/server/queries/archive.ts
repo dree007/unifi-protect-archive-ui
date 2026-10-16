@@ -4,6 +4,7 @@ import { sql, type SQL } from "drizzle-orm";
 
 import type { MetadataStatus } from "@/domain/types";
 import { detectionTypesForQuery, type ArchiveFilters } from "@/lib/archive-filters";
+import { PENDING_CLIP_GRACE_MS } from "@/lib/pending-clip";
 import { addDays, dayKeyInZone, startOfDayInZone } from "@/lib/time-zone";
 import type { ArchivePageModel, EventCardModel, EventDetailModel, FilterOption } from "@/lib/view-models";
 import { uuidArray } from "@/server/db/sql";
@@ -138,6 +139,15 @@ function filterConditions(filters: ArchiveFilters, context: Pick<QueryContext, "
   return conditions;
 }
 
+/**
+ * Events shown in lists and counters (`e` = archive_events): everything except `pendingClip`
+ * events whose grace period is over – the SQL form of `pendingClipHiddenAt` (src/lib/pending-clip.ts).
+ */
+export function shownInOverview(now: Date): SQL {
+  const cutoff = new Date(now.getTime() - PENDING_CLIP_GRACE_MS).toISOString();
+  return sql`(e.metadata_status <> 'pendingClip' or coalesce(e.end_at, e.start_at) > ${cutoff}::timestamptz)`;
+}
+
 const where = (conditions: SQL[]) => (conditions.length > 0 ? sql`where ${sql.join(conditions, sql` and `)}` : sql``);
 
 // --- rows -------------------------------------------------------------------------------------
@@ -242,7 +252,8 @@ export async function toCards(events: readonly EventRow[], context: QueryContext
 
 /**
  * One page of archive events, newest first (start DESC, id DESC as tie-breaker), filtered in
- * PostgreSQL. Keyset pagination: `cursor` is the last row of the previous page.
+ * PostgreSQL. Keyset pagination: `cursor` is the last row of the previous page. Pending events
+ * past their grace period are left out (see {@link shownInOverview}).
  */
 export async function getArchivePage(
   filters: ArchiveFilters,
@@ -250,7 +261,7 @@ export async function getArchivePage(
   context: QueryContext,
   pageSize = ARCHIVE_PAGE_SIZE,
 ): Promise<ArchivePageModel> {
-  const conditions = filterConditions(filters, context);
+  const conditions = [...filterConditions(filters, context), shownInOverview(context.now)];
   const after = decodeCursor(cursor);
   if (after) conditions.push(sql`(e.start_at, e.id) < (${after.startAt}::timestamptz, ${after.id}::uuid)`);
 

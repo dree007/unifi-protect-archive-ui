@@ -327,5 +327,17 @@
   "legal.license": "License (AGPL-3.0-only)",
   "legal.thirdParty": "Third-party notices",
   "legal.source": "Source code",
-  "legal.sourcePending": "Source publication pending"
+  "legal.sourcePending": "Source publication pending",
+  "together.open": "Play together",
+  "together.description": "Two recordings side by side, in sync by recording time.",
+  "together.play": "Play",
+  "together.pause": "Pause",
+  "together.position": "Shared position",
+  "together.startsAt": "Starts at {time}",
+  "together.endedAt": "Ended at {time}",
+  "together.loading": "Loading video",
+  "together.audioOn": "Turn on sound from {label}",
+  "together.audioOff": "Turn off sound from {label}",
+  "together.audioBlocked": "The browser blocked sound – playback continues muted.",
+  "together.choose": "Choose recording for view {slot}"
 }

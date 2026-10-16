@@ -1,12 +1,30 @@
 # Changelog
 
-## Unreleased
+## 1.1.0
+
+Minor release.
+
+### Added
+
+- "Play together": events with two or more clips can play two of them side by side (stacked on
+  phones), synchronized by recording time, with one shared play/pause control and timeline. With
+  more than two clips, each side can switch its clip. Both videos start muted; at most one is
+  audible.
 
 ### Changed
 
+- Events that are still waiting for their recording disappear from the archive list and the
+  dashboard three minutes after the event, until a clip is linked. Nothing is deleted; detail
+  links keep working and the system page still counts them.
 - The public GitHub repository contains only what is needed to run and rebuild the application:
   tests, CI configuration, development tooling and developer documentation stay in the private
   development repository.
+
+### Fixed
+
+- Archive files whose names carry a time zone abbreviation instead of a GMT offset (for example
+  `CDT` or `EST`, as written by UniFi Protect in North American time zones) are now indexed
+  instead of being rejected. Unknown abbreviations are still rejected, never guessed.
 
 ## 1.0.1
 

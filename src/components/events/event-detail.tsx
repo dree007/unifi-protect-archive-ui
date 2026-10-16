@@ -58,6 +58,7 @@ export function EventDetail({ event, variant = "page", actions }: EventDetailPro
         cameraName={event.cameras.map((camera) => camera.unknown ? t("cameras.unknown") : camera.name).join(" · ")}
         pending={event.status === "pendingClip"}
         framed={isPage}
+        timeZone={event.presentation?.timeZone ?? "UTC"}
       />
 
       <header className="flex flex-col gap-3">

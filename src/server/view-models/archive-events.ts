@@ -213,6 +213,8 @@ function toClipModel(clip: EventClipRow, label: string, format: DateFormat): Cli
     fileSizeBytes: clip.fileSizeBytes,
     startLabel: format.timeWithSeconds(clip.startAt),
     endLabel: format.timeWithSeconds(clip.endAt),
+    start: clip.startAt.toISOString(),
+    end: clip.endAt.toISOString(),
     durationSeconds: Math.round(clip.durationMs / 1000),
     videoUrl: clipVideoUrl(clip.clipId),
     thumbnailUrl: thumbnailUrl(clip),
