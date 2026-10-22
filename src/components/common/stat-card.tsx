@@ -19,15 +19,15 @@ export function StatCard({ label, value, unit, hint, icon: Icon, tone = "primary
   return (
     <div className={cn("surface-card flex flex-col gap-3 p-4 sm:p-5", className)}>
       <div className="flex items-center justify-between gap-2">
-        <p className="text-sm font-medium text-muted-foreground">{label}</p>
+        <p className="text-sm font-medium text-graphite">{label}</p>
         <span className={cn("grid size-9 shrink-0 place-items-center rounded-full", TONE_CLASSES[tone])}>
           <Icon aria-hidden className="size-4.5" />
         </span>
       </div>
       <div className="flex flex-col gap-1">
         <p className="flex flex-wrap items-baseline gap-x-1.5">
-          <span className="text-2xl font-semibold tracking-tight tabular-nums">{value}</span>
-          {unit && <span className="text-sm font-medium text-muted-foreground">{unit}</span>}
+          <span className="type-value">{value}</span>
+          {unit && <span className="text-sm text-muted-foreground">{unit}</span>}
         </p>
         {hint && <p className="text-[0.8125rem] text-muted-foreground">{hint}</p>}
       </div>

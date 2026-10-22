@@ -5,4 +5,5 @@ export * from "./protect-events";
 export * from "./archive-events";
 export * from "./archive-scan-runs";
 export * from "./background-component-status";
+export * from "./collections";
 export * from "./relations";

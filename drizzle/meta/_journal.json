@@ -36,6 +36,13 @@
       "when": 1791585018495,
       "tag": "0004_background_component_status",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792596759200,
+      "tag": "0005_favorites_collections",
+      "breakpoints": true
     }
   ]
 }

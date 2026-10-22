@@ -64,7 +64,7 @@ for (const signal of ["SIGINT", "SIGTERM"] as const) {
 let exitCode = 1;
 try {
   const config = readWorkerConfig();
-  logger.info("Unifi Protect Archive UI background worker");
+  logger.info("Protect Archive UI background worker");
   const result = await runWorker({ config, signal: controller.signal, logger, shutdownTimeoutMs: 6_000 });
   exitCode = result.exitCode;
 } catch (error) {

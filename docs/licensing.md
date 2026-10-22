@@ -1,6 +1,6 @@
 # Licensing and source availability
 
-Unifi Protect Archive UI is licensed under **GNU Affero General Public License v3.0 only**
+Protect Archive UI is licensed under **GNU Affero General Public License v3.0 only**
 (`AGPL-3.0-only`). [LICENSE](../LICENSE) contains the complete license text. This does not change
 third-party copyrights/licenses. No warranty is provided; redistribution is permitted under the
 applicable license terms. Existing source and dependency notices must be preserved.

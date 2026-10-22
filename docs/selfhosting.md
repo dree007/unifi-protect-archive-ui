@@ -1,6 +1,6 @@
-# Selfhosting Unifi Protect Archive UI
+# Selfhosting Protect Archive UI
 
-Unifi Protect Archive UI runs as three permanent services: **web**, **worker** and **PostgreSQL 18**.
+Protect Archive UI runs as three permanent services: **web**, **worker** and **PostgreSQL 18**.
 A fourth service, **migrate**, applies pending schema migrations and exits. Web, worker and
 migrate use the same application image. No Redis, external scheduler or separate backend is needed.
 No mobile app is included.
@@ -22,8 +22,8 @@ in the containers and do not need to be installed on the host.
 # Check the SERVER Engine version, not just the Docker client version.
 docker version --format '{{.Server.Version}}'
 docker compose version
-curl -fsSLO https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.1.0/docker-compose.yml
-curl -fsSL -o .env https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v1.1.0/.env.example
+curl -fsSLO https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v2.0.0/docker-compose.yml
+curl -fsSL -o .env https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v2.0.0/.env.example
 chmod 600 .env
 # Edit .env: set POSTGRES_PASSWORD and NAS_ARCHIVE_HOST_PATH.
 docker compose up -d
@@ -34,7 +34,7 @@ Open **http://<docker-host-ip>:3100** from a permitted LAN device. No extra bind
 SSH tunnel, proxy, DNS entry or router forwarding is required in the default LAN mode.
 Protect is optional: leave its settings empty for NAS-only use.
 The first startup pulls the ready-made image, creates the schema and starts indexing; no demo data is inserted.
-The default image is `ghcr.io/dree007/unifi-protect-archive-ui:1.1.0`, Linux amd64. It is pulled
+The default image is `ghcr.io/dree007/unifi-protect-archive-ui:2.0.0`, Linux amd64. It is pulled
 anonymously; no registry account, source tree or local compilation is needed.
 `migrate` exiting with code **0** is normal.
 
@@ -300,7 +300,7 @@ Fingerprinted Next.js assets retain their usual immutable cache policy.
 The persistent JPEG cache in the `thumbnails` volume remains enabled; HTTP storage prevention
 does not force repeated ffmpeg generation. Versioned media URLs and ETags remain valid.
 
-Unifi Protect Archive UI has no session/logout API. After Authentik or another gateway revokes access,
+Protect Archive UI has no session/logout API. After Authentik or another gateway revokes access,
 every new request must be denied before reaching the backend. Existing downloaded files,
 older HTTP cache entries, screenshots, already displayed frames and in-flight responses cannot
 be remotely erased by these headers. Close sensitive tabs/use a private browser profile on

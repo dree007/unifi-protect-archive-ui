@@ -20,13 +20,13 @@ export function DetectionDistribution({ counts }: { counts: readonly { type: str
         const { icon: Icon, badge, solid } = detectionStyle(type);
         return (
           <li key={type} className="flex items-center gap-3">
-            <span className={cn("grid size-9 shrink-0 place-items-center rounded-[var(--radius-control)]", badge)}>
+            <span className={cn("grid size-9 shrink-0 place-items-center rounded-sm", badge)}>
               <Icon aria-hidden className="size-4.5" />
             </span>
             <div className="flex min-w-0 flex-1 flex-col gap-1.5">
               <div className="flex items-baseline justify-between gap-2 text-sm">
                 <span className="truncate font-medium">{detectionLabel(type, t)}</span>
-                <span className="font-semibold tabular-nums">{formatNumber(count, locale)}</span>
+                <span className="font-medium tabular-nums">{formatNumber(count, locale)}</span>
               </div>
               <div aria-hidden className="h-2 overflow-hidden rounded-full bg-surface-muted">
                 <div className={cn("h-full rounded-full", solid)} style={{ width: `${(count / max) * 100}%` }} />

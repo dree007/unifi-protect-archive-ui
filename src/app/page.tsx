@@ -56,7 +56,7 @@ export default async function DashboardPage() {
           <div className="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
             <section aria-labelledby="recent-events" className="flex flex-col gap-4">
               <div className="flex items-center justify-between gap-3 px-1">
-                <h2 id="recent-events" className="text-lg font-semibold tracking-tight">
+                <h2 id="recent-events" className="type-heading">
                   {t("dashboard.recent")}
                 </h2>
                 <Button asChild variant="ghost" className="text-primary">

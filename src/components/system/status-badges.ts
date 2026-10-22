@@ -19,8 +19,9 @@ import type { MessageKey } from "@/i18n/core";
 import type { StatusBadge } from "./status-parts";
 
 /**
- * Labels and soft tones of every operating state: mint = fine, apricot = attention, pastel red
- * = error, neutral = deliberately off / not available. "Stale" and "unknown" are never green.
+ * Labels and tones of every operating state (see tone.ts): violet tint = fine, ember tint =
+ * attention, ember ink = error, neutral = deliberately off / not available. "Stale" and
+ * "unknown" are never shown as fine.
  */
 
 type TranslatedBadge = Omit<StatusBadge, "label"> & { label: MessageKey };

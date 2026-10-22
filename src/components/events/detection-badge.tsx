@@ -14,22 +14,23 @@ interface DetectionStyle {
 }
 
 /**
- * The one place that assigns colors to detection types: soft pastel surfaces with dark ink
- * (≥ 6:1, see globals.css) – person lavender, vehicle blue, animal mint, package blush.
- * Always icon + text, never color alone.
+ * The one place that styles detection types. Atelier Soft allows no extra accent colors, so
+ * every known type shares the violet tint (violet ink on violet-soft, 7:1) and is told apart by
+ * its icon and label – never by color.
  */
+const DETECTED = { badge: "bg-violet-soft text-violet-ink", solid: "bg-violet-spark" };
 const KNOWN_STYLES: Record<string, DetectionStyle> = {
-  person: { icon: User, badge: "bg-detect-person text-detect-person-ink", solid: "bg-detect-person-solid" },
-  vehicle: { icon: Car, badge: "bg-detect-vehicle text-detect-vehicle-ink", solid: "bg-detect-vehicle-solid" },
-  animal: { icon: PawPrint, badge: "bg-detect-animal text-detect-animal-ink", solid: "bg-detect-animal-solid" },
-  package: { icon: Package, badge: "bg-detect-package text-detect-package-ink", solid: "bg-detect-package-solid" },
-  face: { icon: ScanFace, badge: "bg-detect-face text-detect-face-ink", solid: "bg-detect-face-solid" },
-  licensePlate: { icon: RectangleEllipsis, badge: "bg-detect-plate text-detect-plate-ink", solid: "bg-detect-plate-solid" },
+  person: { icon: User, ...DETECTED },
+  vehicle: { icon: Car, ...DETECTED },
+  animal: { icon: PawPrint, ...DETECTED },
+  package: { icon: Package, ...DETECTED },
+  face: { icon: ScanFace, ...DETECTED },
+  licensePlate: { icon: RectangleEllipsis, ...DETECTED },
 };
 
 /** Unknown/new Protect types: a neutral generic style. */
-const GENERIC_STYLE: DetectionStyle = { icon: Tag, badge: "bg-detect-other text-detect-other-ink", solid: "bg-detect-other-solid" };
-const ARCHIVE_CLIP_STYLE = { icon: Film, badge: "bg-pastel-neutral text-pastel-neutral-ink" };
+const GENERIC_STYLE: DetectionStyle = { icon: Tag, badge: "bg-neutral-soft text-neutral-strong", solid: "bg-ash" };
+const ARCHIVE_CLIP_STYLE = { icon: Film, badge: "bg-neutral-soft text-neutral-strong" };
 
 export function detectionStyle(type: string): DetectionStyle {
   return Object.hasOwn(KNOWN_STYLES, type) ? KNOWN_STYLES[type] : GENERIC_STYLE;

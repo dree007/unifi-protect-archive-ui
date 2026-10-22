@@ -39,7 +39,7 @@ export function EventTimeline({ events, hrefFor, selectedId, onEventClick, listC
         return (
           <section key={first.dayKey} aria-labelledby={headingId} className="flex flex-col gap-3">
             <div className="flex items-baseline gap-2 px-1">
-              <h2 id={headingId} className="text-[0.9375rem] font-semibold tracking-tight">
+              <h2 id={headingId} className="text-[0.9375rem] font-medium">
                 {first.dayLabel}
               </h2>
               {relative && <span className="text-sm text-muted-foreground">{first.dateLabel}</span>}

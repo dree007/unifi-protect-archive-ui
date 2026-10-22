@@ -1,5 +1,41 @@
 # Changelog
 
+## 2.0.0
+
+Major release: a new name, a new visual design and a database migration.
+
+### Upgrade
+
+- Back up the database before upgrading (docs/selfhosting.md, "Backup and restore"). The `migrate`
+  service applies migration `0005_favorites_collections` on startup; it only adds three empty
+  tables and changes no existing data.
+- After the migration, version 1.x refuses to start against the database. Going back means
+  restoring the backup.
+- The Compose file, image name, environment variables and data volumes are unchanged; only the
+  default image tag moves to `2.0.0`.
+
+### Added
+
+- Favorites and collections: mark an event (a situation, with all its recordings) as favorite
+  and organize events in your own collections (for example "Front door" or "Parcel deliveries").
+  An event can be in several collections. Under the archive's search field, "Favorites" and every
+  collection are chips that filter the archive and combine with all other filters; "Manage
+  collections" creates, renames and deletes them. Only metadata is stored; the videos on the NAS
+  stay untouched. The database migration adds three empty tables.
+- Clips whose file the latest complete archive scan no longer found are marked as no longer in
+  the archive on the event page.
+
+### Changed
+
+- New visual design "Atelier Soft": warm eggshell surfaces, ink text, soft shadows, pill-shaped
+  buttons, tags and tabs, and the fonts Inter, Inter Tight and Geist Mono (self-hosted, no
+  requests to Google). Pages, navigation and functions are unchanged.
+- The product is now called "Protect Archive UI" (web interface, page titles, image label, log
+  output and documentation). Image and repository names are unchanged.
+- Events without detections are titled by their cameras ("Driveway + Doorbell") instead of
+  "Archived clip"; touch screens get 44 px targets; the event page shows its facts and notes
+  without nested boxes.
+
 ## 1.1.0
 
 Minor release.

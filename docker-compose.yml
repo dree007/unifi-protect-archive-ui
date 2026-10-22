@@ -1,4 +1,4 @@
-# Unifi Protect Archive UI: one image, four roles, one web port.
+# Protect Archive UI: one image, four roles, one web port.
 # Set POSTGRES_PASSWORD and NAS_ARCHIVE_HOST_PATH in .env, then:
 # docker compose up -d -> http://<docker-host-ip>:3100
 # LAN mode has no login or HTTPS. See SECURITY.md before exposing the port.
@@ -24,7 +24,7 @@ services:
     networks: [internal]
 
   migrate:
-    image: ${UNIFI_ARCHIVE_IMAGE:-ghcr.io/dree007/unifi-protect-archive-ui:1.1.0}
+    image: ${UNIFI_ARCHIVE_IMAGE:-ghcr.io/dree007/unifi-protect-archive-ui:2.0.0}
     command: ["node", "cli/migrate.mjs"]
     restart: "no"
     user: "1000:1000"
@@ -43,7 +43,7 @@ services:
     networks: [internal]
 
   web:
-    image: ${UNIFI_ARCHIVE_IMAGE:-ghcr.io/dree007/unifi-protect-archive-ui:1.1.0}
+    image: ${UNIFI_ARCHIVE_IMAGE:-ghcr.io/dree007/unifi-protect-archive-ui:2.0.0}
     restart: unless-stopped
     user: "1000:1000"
     group_add: ["${NAS_ARCHIVE_GID:-1000}"]
@@ -83,7 +83,7 @@ services:
     networks: [internal, default]
 
   worker:
-    image: ${UNIFI_ARCHIVE_IMAGE:-ghcr.io/dree007/unifi-protect-archive-ui:1.1.0}
+    image: ${UNIFI_ARCHIVE_IMAGE:-ghcr.io/dree007/unifi-protect-archive-ui:2.0.0}
     command: ["node", "--enable-source-maps", "cli/worker-run.mjs"]
     restart: unless-stopped
     user: "1000:1000"

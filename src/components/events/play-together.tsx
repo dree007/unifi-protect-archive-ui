@@ -36,10 +36,10 @@ export function PlayTogether({ clips, timeZone, open, onOpenChange }: PlayTogeth
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="bottom"
-        className="top-0 gap-0 overflow-y-auto border-none bg-card pb-safe shadow-[var(--shadow-elevated)] sm:inset-x-4 sm:top-8 sm:data-[side=bottom]:bottom-auto sm:mx-auto sm:max-h-[calc(100dvh-4rem)] sm:max-w-6xl sm:rounded-[1.75rem]"
+        className="top-0 gap-0 overflow-y-auto border-none bg-card pb-safe shadow-soft-lg sm:inset-x-4 sm:top-8 sm:data-[side=bottom]:bottom-auto sm:mx-auto sm:max-h-[calc(100dvh-4rem)] sm:max-w-6xl sm:rounded-card-lg"
       >
         <SheetHeader className="px-4 pt-4 pr-14 pb-3 sm:px-6 sm:pt-5">
-          <SheetTitle className="text-lg">{t("together.open")}</SheetTitle>
+          <SheetTitle>{t("together.open")}</SheetTitle>
           <SheetDescription>{t("together.description")}</SheetDescription>
         </SheetHeader>
         {/* Mounted only while open: no video data before, everything released after. */}
@@ -124,7 +124,7 @@ function TogetherView({ clips, timeZone }: { clips: ClipModel[]; timeZone: strin
       </div>
 
       <div className="surface-inset flex items-center gap-3 px-3 py-2.5 sm:gap-4 sm:px-4">
-        <Button size="icon-lg" className="shrink-0 rounded-full" onClick={toggle} aria-label={playing ? t("together.pause") : t("together.play")}>
+        <Button size="icon-lg" className="shrink-0" onClick={toggle} aria-label={playing ? t("together.pause") : t("together.play")}>
           {playing ? <Pause aria-hidden /> : <Play aria-hidden />}
         </Button>
         <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -140,7 +140,7 @@ function TogetherView({ clips, timeZone }: { clips: ClipModel[]; timeZone: strin
             }}
             aria-label={t("together.position")}
             aria-valuetext={at}
-            className="h-6 w-full cursor-pointer accent-primary"
+            className="h-6 w-full cursor-pointer accent-ink"
           />
           <div className="flex justify-between gap-3 text-xs text-muted-foreground tabular-nums">
             <span className="font-medium text-foreground" data-together-time>
@@ -184,7 +184,7 @@ function TogetherSlot({ index, clip, phase, choices, onReplace, audible, onToggl
           <Select value={clip.id} onValueChange={onReplace}>
             <SelectTrigger
               aria-label={t("together.choose", { slot: index + 1 })}
-              className="surface-control h-10 min-w-0 rounded-full border-transparent px-4 font-medium hover:bg-surface-muted"
+              className="surface-control h-10 min-w-0 rounded-full border-transparent px-4 font-medium"
             >
               <SelectValue />
             </SelectTrigger>
@@ -202,7 +202,7 @@ function TogetherSlot({ index, clip, phase, choices, onReplace, audible, onToggl
         <Button
           variant="ghost"
           size="icon"
-          className="shrink-0 rounded-full"
+          className="shrink-0"
           aria-pressed={audible}
           aria-label={t(audible ? "together.audioOff" : "together.audioOn", { label: clip.label })}
           onClick={onToggleAudio}
@@ -248,7 +248,7 @@ function SlotVideo({
   if (state === "unavailable" || state === "unsupported") {
     const { title, text } = FAILURE_TEXT[state];
     return (
-      <div role="status" className="flex aspect-video flex-col items-center justify-center gap-2 rounded-[var(--radius-inner)] bg-media px-6 text-center text-primary-foreground">
+      <div role="status" className="flex aspect-video flex-col items-center justify-center gap-2 rounded-md bg-media px-6 text-center text-on-ink">
         <VideoOff aria-hidden className="size-7 opacity-70" />
         <p className="font-medium">{t(title)}</p>
         <p className="max-w-sm text-sm opacity-75">{t(text)}</p>
@@ -258,7 +258,7 @@ function SlotVideo({
 
   const idle = phase.phase !== "active";
   return (
-    <div className="relative aspect-video overflow-hidden rounded-[var(--radius-inner)] bg-media">
+    <div className="relative aspect-video overflow-hidden rounded-md bg-media">
       <video
         ref={attach}
         src={clip.videoUrl}
@@ -282,13 +282,13 @@ function SlotVideo({
         className={cn("size-full object-contain transition-opacity duration-300", idle && "opacity-40")}
       />
       {state === "loading" && (
-        <span className="absolute top-2 right-2 grid size-8 place-items-center rounded-full bg-media/70 text-primary-foreground">
+        <span className="absolute top-2 right-2 grid size-8 place-items-center rounded-full bg-media/70 text-on-ink">
           <Loader2 aria-hidden className="size-4 animate-spin motion-reduce:animate-none" />
           <span className="sr-only">{t("together.loading")}</span>
         </span>
       )}
       {idle && (
-        <p role="status" className="absolute inset-x-0 bottom-0 m-2 self-end rounded-full bg-media/75 px-3 py-1.5 text-center text-sm font-medium text-primary-foreground tabular-nums">
+        <p role="status" className="absolute inset-x-0 bottom-0 m-2 self-end rounded-full bg-media/75 px-3 py-1.5 text-center text-sm font-medium text-on-ink tabular-nums">
           {phase.phase === "before" ? t("together.startsAt", { time: formatTime(phase.startsAtMs) }) : t("together.endedAt", { time: formatTime(phase.endedAtMs) })}
         </p>
       )}

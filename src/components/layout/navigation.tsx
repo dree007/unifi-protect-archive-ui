@@ -40,9 +40,9 @@ export function SidebarNavigation() {
                 href={href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex h-12 items-center gap-3 rounded-[var(--radius-control)] px-4 text-[0.9375rem] font-medium text-muted-foreground transition-colors duration-200 outline-none",
-                  "hover:bg-card/70 hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring",
-                  active && "surface-selected font-semibold hover:bg-selected hover:text-selected-foreground",
+                  "flex h-12 items-center gap-3 rounded-full px-4 text-[0.9375rem] transition-[background-color,box-shadow,color] duration-200 outline-none focus-ring",
+                  // Active: the raised pill on the warm-taupe band (TabPills pattern), no color.
+                  active ? "surface-control font-medium" : "text-graphite hover:bg-eggshell/70 hover:text-foreground",
                 )}
               >
                 <Icon aria-hidden className="size-5" />
@@ -63,7 +63,7 @@ export function MobileNavigation() {
   return (
     <nav
       aria-label={t("navigation.main")}
-      className="fixed inset-x-0 bottom-0 z-40 rounded-t-[1.5rem] bg-card/90 pb-safe shadow-[0_-10px_30px_-16px_rgb(37_48_71/0.22)] backdrop-blur-lg lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 rounded-t-card border-t border-line bg-surface-muted pb-safe lg:hidden"
     >
       <ul className="mx-auto grid max-w-md grid-cols-4 px-2">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
@@ -74,15 +74,15 @@ export function MobileNavigation() {
                 href={href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "group flex h-15 flex-col items-center justify-center gap-0.5 rounded-[var(--radius-control)] text-xs font-medium text-muted-foreground outline-none",
-                  "focus-visible:ring-3 focus-visible:ring-ring",
-                  active && "font-semibold text-selected-foreground",
+                  "group flex h-15 flex-col items-center justify-center gap-0.5 rounded-md text-xs font-medium text-graphite outline-none",
+                  "focus-ring",
+                  active && "text-foreground",
                 )}
               >
                 <span
                   className={cn(
-                    "grid h-8 w-14 place-items-center rounded-full transition-colors duration-200",
-                    active ? "bg-selected" : "group-hover:bg-muted",
+                    "grid h-8 w-14 place-items-center rounded-full transition-[background-color,box-shadow] duration-200",
+                    active ? "surface-control" : "group-hover:bg-eggshell/70",
                   )}
                 >
                   <Icon aria-hidden className="size-5" />

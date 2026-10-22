@@ -70,7 +70,7 @@ export function ClipPlayer({ clips, cameraName, pending, framed = false, timeZon
         // Inside the frame the radius shrinks by the padding, so the curves stay concentric.
         className={cn(
           "overflow-hidden bg-media",
-          framed ? "rounded-[calc(var(--radius-card)-0.5rem)] sm:rounded-[calc(var(--radius-card)-0.625rem)]" : "rounded-[var(--radius-inner)]",
+          framed ? "rounded-[calc(var(--radius-card)-0.5rem)] sm:rounded-[calc(var(--radius-card)-0.625rem)]" : "rounded-md",
         )}
       >
         {together ? (
@@ -116,11 +116,12 @@ export function ClipPlayer({ clips, cameraName, pending, framed = false, timeZon
                 onClick={() => setSelectedId(clip.id)}
                 onKeyDown={(event) => onKeyDown(event, index)}
                 className={cn(
-                  "flex min-h-11 max-w-full items-center gap-2.5 rounded-[var(--radius-control)] py-1.5 pr-3.5 pl-1.5 text-left text-sm outline-none transition-colors duration-200 focus-visible:ring-3 focus-visible:ring-ring",
-                  isSelected ? "surface-selected" : "surface-control text-foreground hover:bg-surface-muted",
+                  // Tabs are pills: the selected one carries the violet tint.
+                  "flex min-h-11 max-w-full items-center gap-2.5 rounded-full py-1.5 pr-4 pl-1.5 text-left text-sm outline-none focus-ring",
+                  isSelected ? "surface-selected" : "surface-control",
                 )}
               >
-                <span className="relative block aspect-[4/3] w-12 shrink-0 overflow-hidden rounded-[calc(var(--radius-control)-0.375rem)] bg-pastel-neutral">
+                <span className="relative block aspect-[4/3] w-12 shrink-0 overflow-hidden rounded-full bg-stone">
                   <ClipThumbnail key={clip.thumbnailUrl} src={clip.thumbnailUrl} />
                 </span>
                 <span className="flex min-w-0 flex-col leading-tight">
@@ -162,7 +163,7 @@ function ClipVideo({ clip }: { clip: ClipModel }) {
   if (state === "unavailable" || state === "unsupported") {
     const { title, text } = FAILURE_TEXT[state];
     return (
-      <div role="status" className="flex aspect-video flex-col items-center justify-center gap-2 px-6 text-center text-primary-foreground">
+      <div role="status" className="flex aspect-video flex-col items-center justify-center gap-2 px-6 text-center text-on-ink">
         <VideoOff aria-hidden className="size-8 opacity-70" />
         <p className="font-medium">{t(title)}</p>
         <p className="max-w-sm text-sm opacity-75">

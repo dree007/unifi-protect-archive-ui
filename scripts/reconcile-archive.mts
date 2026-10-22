@@ -54,7 +54,7 @@ try {
   });
   console.log(
     [
-      result.dryRun ? "Unifi Protect Archive UI reconciliation (dry run, nothing written)" : "Unifi Protect Archive UI reconciliation completed",
+      result.dryRun ? "Protect Archive UI reconciliation (dry run, nothing written)" : "Protect Archive UI reconciliation completed",
       "",
       line("Cameras resolved", result.clipCamerasResolved),
       line("Clips processed", result.clipsTotal),

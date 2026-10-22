@@ -36,6 +36,7 @@ interface ArchiveBrowserProps {
   firstPage: ArchivePageModel;
   cameras: FilterOption[];
   detectionTypes: string[];
+  collections: FilterOption[];
   /** Problem with a custom range from the URL (shown next to the date fields). */
   rangeIssue?: CustomRangeIssue;
 }
@@ -47,7 +48,7 @@ interface ArchiveBrowserProps {
  * History: every filter change is a new entry (Back returns to the previous filters); while
  * refining a search, debounced updates replace the entry instead of adding one per pause.
  */
-export function ArchiveBrowser({ filters, firstPage, cameras, detectionTypes, rangeIssue }: ArchiveBrowserProps) {
+export function ArchiveBrowser({ filters, firstPage, cameras, detectionTypes, collections, rangeIssue }: ArchiveBrowserProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [search, setSearch] = useState(filters.query);
@@ -115,9 +116,12 @@ export function ArchiveBrowser({ filters, firstPage, cameras, detectionTypes, ra
         onSearchSubmit={() => applySearch(search)}
         cameras={cameras}
         detectionTypes={detectionTypes}
+        collections={collections}
         rangeIssue={rangeIssue}
         onChange={updateFilters}
         onReset={resetFilters}
+        // Only the filter options change; loaded pages, selection and a running video stay.
+        onCollectionsChanged={() => router.refresh()}
       />
       <div aria-busy={isPending} className={isPending ? "opacity-60 transition-opacity" : "transition-opacity"}>
         {/* New filters → new first page: remount resets loaded pages and selection. */}
@@ -213,7 +217,7 @@ function ArchiveResults({
         />
         <div className="flex flex-col items-center gap-2 pt-1" aria-live="polite">
           {nextCursor ? (
-            <Button variant="outline" size="lg" onClick={loadMore} disabled={loadingMore} className="min-w-44 border-transparent bg-card shadow-[var(--shadow-card)]">
+            <Button variant="outline" size="lg" onClick={loadMore} disabled={loadingMore} className="min-w-44">
               {loadingMore && <Loader2 aria-hidden className="animate-spin" />}
               {loadingMore ? t("common.loadingMore") : t("archive.more")}
             </Button>
@@ -223,7 +227,7 @@ function ArchiveResults({
               {isFiltered(filters) ? t("archive.noMore") : t("archive.end")}
             </p>
           )}
-          {loadError && <p className="text-sm text-danger-strong">{t("errors.loadMore")}</p>}
+          {loadError && <p className="text-sm font-medium text-danger-strong">{t("errors.loadMore")}</p>}
         </div>
       </div>
 

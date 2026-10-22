@@ -1,7 +1,7 @@
 import { isDayKey } from "./time-zone";
 
 /**
- * Archive filters as they live in the URL (`/archive?q=Garten&period=7d&camera=…&type=person`).
+ * Archive filters as they live in the URL (`/archive?q=Garten&period=7d&camera=…&type=person&fav=1`).
  * Pure: parsing, serializing and safe "back to archive" links. Filtering itself happens in
  * PostgreSQL (src/server/queries/archive.ts); semantics in docs/web-ui.md.
  */
@@ -30,6 +30,10 @@ export interface ArchiveFilters {
   cameraId: string;
   detection: DetectionFilter;
   onlyDetected: boolean;
+  /** Only favorite events (at least one of their clips is marked). */
+  favorites: boolean;
+  /** Collection ID or `all`: only events in that collection (at least one of their clips). */
+  collectionId: string;
 }
 
 export const DEFAULT_ARCHIVE_FILTERS: ArchiveFilters = {
@@ -40,6 +44,8 @@ export const DEFAULT_ARCHIVE_FILTERS: ArchiveFilters = {
   cameraId: "all",
   detection: "all",
   onlyDetected: false,
+  favorites: false,
+  collectionId: "all",
 };
 
 const MAX_QUERY_LENGTH = 100;
@@ -60,6 +66,7 @@ export function parseArchiveFilters(params: ParamSource): ArchiveFilters {
   const period = read(params, "period");
   const detection = read(params, "type");
   const camera = read(params, "camera");
+  const collection = read(params, "collection");
   const from = read(params, "from") ?? "";
   const to = read(params, "to") ?? "";
   return {
@@ -70,6 +77,8 @@ export function parseArchiveFilters(params: ParamSource): ArchiveFilters {
     cameraId: camera && UUID.test(camera) ? camera.toLowerCase() : "all",
     detection: detection === "none" || (detection && DETECTION_TYPE.test(detection)) ? detection : "all",
     onlyDetected: read(params, "detected") === "1",
+    favorites: read(params, "fav") === "1",
+    collectionId: collection && UUID.test(collection) ? collection.toLowerCase() : "all",
   };
 }
 
@@ -130,10 +139,15 @@ export function serializeArchiveFilters(filters: ArchiveFilters): URLSearchParam
   if (filters.cameraId !== "all") params.set("camera", filters.cameraId);
   if (filters.detection !== "all") params.set("type", filters.detection);
   if (filters.onlyDetected) params.set("detected", "1");
+  if (filters.favorites) params.set("fav", "1");
+  if (filters.collectionId !== "all") params.set("collection", filters.collectionId);
   return params;
 }
 
-/** Number of filters set beyond search and period (badge on the mobile filter button). */
+/**
+ * Number of filters set in the mobile filter sheet (badge on its button). Favorites and the
+ * collection are not counted: they have a visible row of their own.
+ */
 export function countRefinements(filters: ArchiveFilters): number {
   return [filters.cameraId !== "all", filters.detection !== "all", filters.onlyDetected].filter(Boolean).length;
 }

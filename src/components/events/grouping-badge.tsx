@@ -8,7 +8,7 @@ import type { GroupingKind } from "@/lib/view-models";
 
 const STYLES: Record<GroupingKind, { icon: typeof Clock3; className: string }> = {
   // Quiet outline: the normal case for several cameras with Protect detections.
-  metadata: { icon: Link2, className: "border border-border text-muted-foreground" },
+  metadata: { icon: Link2, className: "border border-line text-graphite" },
   // Soft neutral fill: grouped by time only – noticeable, but not a warning.
   temporal: { icon: Clock3, className: "bg-neutral-soft text-neutral-strong" },
 };

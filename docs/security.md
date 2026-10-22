@@ -1,6 +1,6 @@
 # Selfhosted access boundary
 
-Unifi Protect Archive UI contains private camera footage and has no integrated user/session management.
+Protect Archive UI contains private camera footage and has no integrated user/session management.
 The default is direct access on all IPv4 host interfaces, intended only for a trusted, restricted
 LAN. It provides no authentication or HTTPS. Protected proxy mode is an explicit alternative.
 Use Linux, Docker Engine **>=28.0.0**, and the Compose plugin **>=5.6.0** (the tested baseline).
@@ -114,7 +114,7 @@ persistent cache reduces ffmpeg work and is not a browser/shared-proxy HTTP cach
 Next.js JS/CSS/font assets may keep immutable caching; do not apply a global no-store override.
 
 After access is revoked, every **new** media request must be checked and denied by the external
-gateway. Unifi Protect Archive UI has no logout endpoint and cannot invalidate Authentik's sessions itself.
+gateway. Protect Archive UI has no logout endpoint and cannot invalidate Authentik's sessions itself.
 Use Authentik's documented session/policy revocation procedure and check when it takes effect.
 
 Already received footage, older saved/cache entries, screenshots, frames still displayed in a

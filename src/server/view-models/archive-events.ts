@@ -40,6 +40,11 @@ export interface EventClipRow {
   startAt: Date;
   endAt: Date;
   durationMs: number;
+  /** Curation rows of this clip; the event aggregates them (docs/web-ui.md, "Favorites and collections"). */
+  favorite: boolean;
+  collectionIds: string[];
+  /** Not found by the latest completed archive scan: the file is gone from the NAS. */
+  missing: boolean;
 }
 
 export interface EventProtectRow {
@@ -199,6 +204,7 @@ export function toEventCardModel(
     protectEventCount: protectEvents.length,
     previews: eventPreviews(clips),
     grouping: eventGrouping(clips, protectEvents).kind,
+    favorite: clips.some((clip) => clip.favorite),
   };
 }
 
@@ -218,6 +224,7 @@ function toClipModel(clip: EventClipRow, label: string, format: DateFormat): Cli
     durationSeconds: Math.round(clip.durationMs / 1000),
     videoUrl: clipVideoUrl(clip.clipId),
     thumbnailUrl: thumbnailUrl(clip),
+    missing: clip.missing,
   };
 }
 
@@ -250,5 +257,6 @@ export function toEventDetailModel(
     groupingParts: eventGrouping(clips, protectEvents).parts,
     clips: sortedClips.map((clip, index) => toClipModel(clip, labels[index], context.format)),
     protectEvents: [...protectEvents].sort(byStart).map((pe) => toProtectEventModel(pe, context.format)),
+    collectionIds: [...new Set(clips.flatMap((clip) => clip.collectionIds))].sort(),
   };
 }

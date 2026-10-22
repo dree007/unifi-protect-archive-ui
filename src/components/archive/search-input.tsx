@@ -32,14 +32,14 @@ export function SearchInput({ name, value, onChange, placeholder, label, classNa
         value={value}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
-        className="h-12 rounded-full border-transparent pr-12 pl-12 shadow-[var(--shadow-control)] [&::-webkit-search-cancel-button]:hidden"
+        className="h-12 pr-12 pl-12 [&::-webkit-search-cancel-button]:hidden"
       />
       {value && (
         <button
           type="button"
           onClick={() => onChange("")}
           aria-label={t("filters.clearSearch")}
-          className="absolute top-1/2 right-1.5 grid size-9 -translate-y-1/2 place-items-center rounded-full text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring"
+          className="absolute top-1/2 right-1.5 grid size-9 -translate-y-1/2 place-items-center rounded-full text-muted-foreground outline-none transition-colors duration-120 hover:bg-muted hover:text-foreground focus-ring"
         >
           <X aria-hidden className="size-4" />
         </button>

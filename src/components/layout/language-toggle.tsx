@@ -12,16 +12,16 @@ export function LanguageToggle() {
   const [failed, setFailed] = useState(false);
   return (
     <div className="relative shrink-0">
-      <div role="group" aria-label={t("navigation.language")} aria-busy={pending} className="flex rounded-full border border-border bg-card p-1 shadow-[var(--shadow-control)]">
+      <div role="group" aria-label={t("navigation.language")} aria-busy={pending} className="surface-track flex p-1">
         {LOCALES.map((option) => (
           <button key={option} type="button" aria-label={option === "de" ? "Deutsch" : "English"} aria-pressed={option === locale} disabled={pending}
             onClick={() => { if (option === locale) return; setFailed(false); startTransition(async () => { try { await setLocale(option); } catch { setFailed(true); } }); }}
-            className={cn("min-h-11 min-w-11 rounded-full px-2 text-xs outline-none focus-visible:ring-3 focus-visible:ring-ring disabled:opacity-70", option === locale ? "surface-selected font-bold underline underline-offset-4" : "font-medium text-muted-foreground hover:bg-muted")}>
+            className={cn("min-h-11 min-w-11 rounded-full px-2 text-xs font-medium outline-none transition-[background-color,box-shadow,color] duration-200 focus-ring disabled:opacity-70", option === locale ? "surface-control underline underline-offset-4" : "text-graphite hover:text-foreground")}>
             {option.toUpperCase()}
           </button>
         ))}
       </div>
-      {failed && <p role="alert" className="absolute right-0 top-full z-50 mt-2 w-64 rounded-xl bg-card p-3 text-sm shadow-lg">{t("errors.language")}</p>}
+      {failed && <p role="alert" className="absolute right-0 top-full z-50 mt-2 w-64 rounded-md bg-popover p-3 text-sm shadow-soft-md">{t("errors.language")}</p>}
     </div>
   );
 }

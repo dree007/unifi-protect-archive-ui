@@ -10,20 +10,20 @@ export function AppLogo({ compact = false }: { compact?: boolean }) {
   return (
     <Link
       href="/"
-      className="flex min-w-0 items-center gap-3 rounded-2xl outline-none focus-visible:ring-3 focus-visible:ring-ring"
+      className="flex min-w-0 items-center gap-3 rounded-sm outline-none focus-ring"
     >
       <span
         aria-hidden
         className={cn(
-          "grid shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-pastel-lavender to-pastel-blue text-pastel-lavender-ink shadow-[var(--shadow-control)]",
+          "grid shrink-0 place-items-center rounded-sm bg-ink text-on-ink",
           compact ? "size-9" : "size-11",
         )}
       >
         <Cctv className={compact ? "size-5" : "size-6"} />
       </span>
       <span className="flex min-w-0 flex-col leading-tight">
-        <span className={cn("font-semibold tracking-tight", compact ? "text-base" : "text-lg")}>
-          Unifi Protect Archive UI
+        <span className={cn("font-medium tracking-[-0.01em]", compact ? "text-base" : "text-[1.0625rem]")}>
+          Protect Archive UI
         </span>
         {!compact && <span className="text-xs text-muted-foreground">{t("navigation.tagline")}</span>}
       </span>

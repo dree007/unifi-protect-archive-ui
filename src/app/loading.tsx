@@ -10,8 +10,8 @@ export default function Loading() {
   return (
     <div role="status" aria-label={t("common.loading")} className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <Skeleton className="h-8 w-48 rounded-lg" />
-        <Skeleton className="h-4 w-72 rounded-lg" />
+        <Skeleton className="h-8 w-48 rounded-full" />
+        <Skeleton className="h-4 w-72 rounded-full" />
       </div>
       <CardGridSkeleton count={4} className="grid-cols-2 lg:grid-cols-4" />
       <CardGridSkeleton count={4} />

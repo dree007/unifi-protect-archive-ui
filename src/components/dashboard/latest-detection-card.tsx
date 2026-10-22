@@ -19,19 +19,16 @@ export function LatestDetectionCard({ detection, className }: { detection: Lates
     <section
       aria-labelledby="latest-detection"
       className={cn(
-        "relative isolate flex flex-col justify-between gap-6 overflow-hidden rounded-[var(--radius-card)] bg-gradient-to-br from-pastel-lavender via-pastel-blue to-pastel-sky p-5 text-foreground shadow-[var(--shadow-card)] sm:p-7",
+        // The hero card: the warm-taupe level with a 32 px radius and only the light top edge.
+        "flex flex-col justify-between gap-6 rounded-card-lg bg-surface-muted p-5 text-foreground shadow-highlight sm:p-7",
         className,
       )}
     >
-      {/* Soft light, no strong glow. */}
-      <div aria-hidden className="absolute -top-20 -right-12 -z-10 size-64 rounded-full bg-card/55 blur-3xl" />
-      <div aria-hidden className="absolute -bottom-24 -left-12 -z-10 size-56 rounded-full bg-pastel-blush/60 blur-3xl" />
-
       <div className="flex items-center justify-between gap-3">
-        <h2 id="latest-detection" className="text-sm font-medium text-pastel-lavender-ink">
+        <h2 id="latest-detection" className="text-sm font-medium text-graphite">
           {t("dashboard.latest")}
         </h2>
-        <span className="grid size-11 place-items-center rounded-[var(--radius-control)] bg-card/80 text-pastel-lavender-ink shadow-[var(--shadow-control)]">
+        <span className="grid size-11 place-items-center rounded-full bg-card text-ink">
           <Icon aria-hidden className="size-5" />
         </span>
       </div>
@@ -39,7 +36,7 @@ export function LatestDetectionCard({ detection, className }: { detection: Lates
       {detection && primary ? (
         <>
           <div className="flex min-w-0 flex-col gap-1">
-            <p className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+            <p className="type-title text-foreground">
               {detection.detectionTypes.map((type) => detectionLabel(type, t)).join(" · ")}
             </p>
             <p className="truncate text-base text-muted-foreground">
@@ -50,7 +47,7 @@ export function LatestDetectionCard({ detection, className }: { detection: Lates
             <span className="text-sm font-medium text-muted-foreground tabular-nums">{detection.timeLabel} {t("events.clockSuffix")}</span>
             <Link
               href={`/archive/${detection.eventId}`}
-              className="inline-flex h-11 items-center gap-1.5 rounded-full bg-card px-5 text-sm font-semibold text-selected-foreground shadow-[var(--shadow-control)] transition-[background-color,box-shadow] duration-200 outline-none hover:shadow-[var(--shadow-card)] focus-visible:ring-3 focus-visible:ring-ring"
+              className="inline-flex h-11 items-center gap-1.5 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground shadow-ink transition-[background-color,transform] duration-200 outline-none hover:bg-primary-hover focus-ring active:translate-y-px"
             >
               {t("common.view")}<ArrowUpRight aria-hidden className="size-4" />
             </Link>

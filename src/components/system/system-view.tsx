@@ -46,9 +46,9 @@ function ScanRun({ run }: { run: ScanRunModel }) {
 
 const STATUS_ORDER: { status: MetadataStatus; bar: string }[] = [
   // Soft solid tones; every share is also listed with its label and number below the bar.
-  { status: "matched", bar: "bg-detect-person-solid" },
-  { status: "archiveOnly", bar: "bg-detect-other-solid" },
-  { status: "pendingClip", bar: "bg-detect-face-solid" },
+  { status: "matched", bar: "bg-violet-spark" },
+  { status: "archiveOnly", bar: "bg-ash" },
+  { status: "pendingClip", bar: "bg-ember-orange" },
 ];
 
 function WorkerSection({ background }: { background: BackgroundStatusModel }) {
@@ -215,7 +215,7 @@ export function SystemView({ system, background }: { system: SystemStatusModel; 
           {system.lastScan ? <ScanRun run={system.lastScan} /> : <p className="text-sm text-muted-foreground">{t("system.noRuns")}</p>}
           {system.lastCompletedScan && (
             <div className="flex flex-col gap-3 border-t pt-5">
-              <h3 className="text-sm font-semibold">{t("system.lastSuccessfulScan")}</h3>
+              <h3 className="text-sm font-medium">{t("system.lastSuccessfulScan")}</h3>
               <ScanRun run={system.lastCompletedScan} />
             </div>
           )}

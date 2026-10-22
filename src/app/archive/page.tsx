@@ -5,7 +5,13 @@ import { ArchiveBrowser } from "@/components/archive/archive-browser";
 import { Onboarding } from "@/components/common/onboarding";
 import { PageHeader } from "@/components/layout/page-header";
 import { customRangeIssue, parseArchiveFilters } from "@/lib/archive-filters";
-import { getArchivePage, getCameraFilterOptions, getDetectionTypeOptions, hasArchiveEvents } from "@/server/queries/archive";
+import {
+  getArchivePage,
+  getCameraFilterOptions,
+  getCollectionFilterOptions,
+  getDetectionTypeOptions,
+  hasArchiveEvents,
+} from "@/server/queries/archive";
 import { queryContext } from "@/server/queries/context";
 
 export async function generateMetadata(): Promise<Metadata> { const { t } = await getI18n(); return { title: t("common.archive") }; }
@@ -27,17 +33,25 @@ export default async function ArchivePage(props: PageProps<"/archive">) {
     );
   }
 
-  const [firstPage, cameras, detectionTypes] = [
+  const [firstPage, cameras, detectionTypes, collections] = [
     // Start after end matches nothing: no query, the UI explains the range instead.
     rangeIssue === "from-after-to" ? { events: [], nextCursor: null } : await getArchivePage(filters, null, context),
     await getCameraFilterOptions(context),
     await getDetectionTypeOptions(context),
+    await getCollectionFilterOptions(context),
   ];
 
   return (
     <>
       <PageHeader title={t("common.archive")} description={t("archive.description")} />
-      <ArchiveBrowser filters={filters} firstPage={firstPage} cameras={cameras} detectionTypes={detectionTypes} rangeIssue={rangeIssue} />
+      <ArchiveBrowser
+        filters={filters}
+        firstPage={firstPage}
+        cameras={cameras}
+        detectionTypes={detectionTypes}
+        collections={collections}
+        rangeIssue={rangeIssue}
+      />
     </>
   );
 }

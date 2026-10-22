@@ -31,7 +31,7 @@ export function StatusPill({ badge }: { badge: StatusBadge }) {
 
 export function Facts({ items }: { items: [string, ReactNode][] }) {
   return (
-    <dl className="flex flex-col divide-y divide-border/70 text-sm">
+    <dl className="flex flex-col divide-y divide-border text-sm">
       {items.map(([label, value]) => (
         <div key={label} className="flex items-baseline justify-between gap-4 py-2.5 first:pt-0 last:pb-0">
           <dt className="shrink-0 text-muted-foreground">{label}</dt>
@@ -50,15 +50,20 @@ export function Metric({ label, value, tone, dot }: { label: string; value: stri
         {dot && <span aria-hidden className={cn("size-2.5 shrink-0 rounded-full", dot)} />}
         {label}
       </dt>
-      <dd className={cn("text-xl font-semibold tabular-nums", tone === "warning" && "text-warning-strong")}>{value}</dd>
+      <dd className={cn("text-xl font-medium tabular-nums", tone === "warning" && "text-warning-strong")}>{value}</dd>
     </div>
   );
 }
 
-/** Soft, tinted note under a status (error text, hint). Never a loud alarm surface. */
+/**
+ * Soft, tinted note under a status (error text, hint). Never a loud alarm surface: errors use
+ * the ember tint here – the status pill above already carries the solid error tone.
+ */
+const NOTICE_CLASSES = { ...TONE_CLASSES, danger: "bg-danger-soft text-danger-strong" };
+
 export function Notice({ tone, children }: { tone: Extract<Tone, "danger" | "warning" | "neutral" | "info">; children: ReactNode }) {
   return (
-    <p className={cn("rounded-[var(--radius-control)] px-4 py-3 text-sm [overflow-wrap:anywhere]", TONE_CLASSES[tone])} role="status">
+    <p className={cn("rounded-md px-4 py-3 text-sm [overflow-wrap:anywhere]", NOTICE_CLASSES[tone])} role="status">
       {children}
     </p>
   );

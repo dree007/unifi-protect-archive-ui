@@ -46,6 +46,8 @@ export interface EventCardModel {
    * (also) joined by nearly identical recording times. `null` with a single camera.
    */
   grouping: GroupingKind | null;
+  /** The event is a favorite (stored per clip: at least one of its clips is marked). */
+  favorite: boolean;
 }
 
 export type GroupingKind = "metadata" | "temporal";
@@ -92,6 +94,8 @@ export interface ClipModel {
   /** `/api/clips/<id>/video` */
   videoUrl: string;
   thumbnailUrl: string;
+  /** The file was not found by the latest completed archive scan (no longer playable). */
+  missing: boolean;
 }
 
 export interface ProtectEventModel {
@@ -113,6 +117,8 @@ export interface EventDetailModel extends EventCardModel {
   groupingParts: GroupingPartModel[];
   clips: ClipModel[];
   protectEvents: ProtectEventModel[];
+  /** Collections the event belongs to (at least one of its clips is in them). */
+  collectionIds: string[];
 }
 
 export interface CameraViewModel {

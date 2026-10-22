@@ -13,9 +13,9 @@ export function formatDuration(ms: number): string {
 }
 
 const TITLES: Record<ScanResult["status"], string> = {
-  completed: "Unifi Protect Archive UI scan completed",
-  failed: "Unifi Protect Archive UI scan FAILED",
-  dryRun: "Unifi Protect Archive UI scan (dry run, nothing written)",
+  completed: "Protect Archive UI scan completed",
+  failed: "Protect Archive UI scan FAILED",
+  dryRun: "Protect Archive UI scan (dry run, nothing written)",
 };
 
 /** Human-readable summary of a scan, as printed by `npm run archive:scan`. */

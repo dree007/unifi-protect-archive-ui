@@ -1,6 +1,6 @@
 # Third-party notices
 
-Unifi Protect Archive UI 1.0.0 is licensed under **AGPL-3.0-only**; see the full root `LICENSE`
+Protect Archive UI 1.0.0 is licensed under **AGPL-3.0-only**; see the full root `LICENSE`
 (also served at `/notices/LICENSE.txt`).
 Independently licensed dependencies/assets retain their own copyrights and terms. Do not remove
 their required notices or treat the project license as ownership of third-party work.
@@ -9,7 +9,7 @@ their required notices or treat the project license as ownership of third-party 
 |---|---|---|
 | Original favicon `src/app/icon.svg` | Original artwork; owner confirmed publication permission on 2026-10-12 | Covered by the project license; no invented author |
 | Lucide icons including Cctv / Feather-derived icons | Installed lucide-react 1.52.0: ISC / included MIT notice | Exact `public/notices/Lucide-LICENSE.txt` |
-| Geist and Geist Mono | Official Geist font SIL OFL 1.1 | Exact `public/notices/Geist-OFL.txt` |
+| Inter, Inter Tight, Geist Mono | Google Fonts families, each SIL OFL 1.1 | Exact texts in `public/notices/Fonts-OFL.txt` |
 | shadcn/ui-derived components and shadcn CLI | Installed shadcn 4.21.2: MIT, copyright notice retained | Exact `public/notices/shadcn-LICENSE.txt` and installed notice bundle |
 | Next, React, React DOM, Radix, cn, pg, ws, server-only, tw-animate-css | Installed locked packages: MIT | Available package LICENSE/NOTICE files in `dist/notices/npm` |
 | Drizzle ORM and Class Variance Authority | Installed locked packages: Apache-2.0 | Full installed licenses and available notices in the bundle |
@@ -25,8 +25,9 @@ texts and records package versions/licenses in `dist/notices`. Docker includes t
 copies of the root project license and this notice document; parity is tested. No external
 license-scanning service is used. Missing or ambiguous metadata must be reviewed, not inferred.
 
-Geist notice provenance: [official Geist repository](https://github.com/vercel/geist-font),
-SIL OFL text retrieved 2026-10-12; exact text retained. Lucide and shadcn notices come from the
+Font notice provenance: the `ofl/<family>/OFL.txt` files of the
+[Google Fonts repository](https://github.com/google/fonts), retrieved 2026-10-16; exact texts
+retained. Lucide and shadcn notices come from the
 installed versions. Build-time font binaries are supplied by Next's Google Fonts integration;
 recheck metadata/provenance if that supply changes. No official Ubiquiti logo is used as product
 identity. Synthetic test videos are generated locally, never included as footage assets.

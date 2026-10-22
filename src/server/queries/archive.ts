@@ -117,6 +117,19 @@ function filterConditions(filters: ArchiveFilters, context: Pick<QueryContext, "
   }
   if (filters.onlyDetected) conditions.push(detected);
 
+  // Favorites and collections belong to clips: an event matches if at least one of its clips
+  // is a favorite / in the collection. EXISTS, so an event never appears twice.
+  if (filters.favorites) {
+    conditions.push(sql`exists (
+      select 1 from archive_event_clips l join favorite_clips f on f.archived_clip_id = l.archived_clip_id
+      where l.archive_event_id = e.id)`);
+  }
+  if (filters.collectionId !== "all") {
+    conditions.push(sql`exists (
+      select 1 from archive_event_clips l join collection_clips k on k.archived_clip_id = l.archived_clip_id
+      where l.archive_event_id = e.id and k.collection_id = ${filters.collectionId}::uuid)`);
+  }
+
   if (filters.query) {
     // Pragmatic substring search (no full-text index), case-insensitive, LIKE wildcards in the
     // text escaped: camera names (from the file and the current Protect name), clip file names,
@@ -172,10 +185,20 @@ async function loadEventLinks(
     start_at: Timestamp;
     end_at: Timestamp;
     duration_ms: number;
+    favorite: boolean;
+    collection_ids: string[];
+    missing: boolean;
   }>(sql`
+    with basis as (
+      -- "Missing" = not found by the latest completed full scan (docs/nas-indexer.md).
+      select started_at from archive_scan_runs where status = 'completed' order by started_at desc limit 1
+    )
     select l.archive_event_id as event_id, l.primary_group_id, c.id as clip_id, c.camera_id,
            coalesce(cam.name, c.camera_name) as camera_name, c.file_path, c.file_size_bytes,
-           c.file_modified_at, c.start_at, c.end_at, c.duration_ms
+           c.file_modified_at, c.start_at, c.end_at, c.duration_ms,
+           exists (select 1 from favorite_clips f where f.archived_clip_id = c.id) as favorite,
+           array(select k.collection_id::text from collection_clips k where k.archived_clip_id = c.id) as collection_ids,
+           coalesce(c.last_seen_at < (select started_at from basis), false) as missing
     from archive_event_clips l
     join archived_clips c on c.id = l.archived_clip_id
     left join cameras cam on cam.id = c.camera_id
@@ -210,6 +233,9 @@ async function loadEventLinks(
       startAt: toDate(row.start_at),
       endAt: toDate(row.end_at),
       durationMs: Number(row.duration_ms),
+      favorite: row.favorite,
+      collectionIds: row.collection_ids,
+      missing: row.missing,
     })),
     protectEvents: protectEvents.rows.map((row) => ({
       eventId: row.event_id,
@@ -318,6 +344,12 @@ export async function getEventDetail(eventId: string, context: QueryContext): Pr
 /** Camera filter options: all known cameras, by name. */
 export async function getCameraFilterOptions(context: QueryContext): Promise<FilterOption[]> {
   const result = await context.db.execute<{ id: string; name: string }>(sql`select id, name from cameras order by name, id`);
+  return result.rows.map((row) => ({ value: row.id, label: row.name }));
+}
+
+/** Collection filter options, by name; one query (no counts needed for the filter). */
+export async function getCollectionFilterOptions(context: QueryContext): Promise<FilterOption[]> {
+  const result = await context.db.execute<{ id: string; name: string }>(sql`select id, name from collections order by lower(name), id`);
   return result.rows.map((row) => ({ value: row.id, label: row.name }));
 }
 

@@ -15,12 +15,12 @@ export function CameraBadge({
     <span
       {...props}
       className={cn(
-        "inline-flex max-w-full shrink-0 items-center gap-1.5 rounded-full bg-surface-muted font-medium text-foreground/85",
+        "inline-flex max-w-full shrink-0 items-center gap-1.5 rounded-full bg-surface-muted font-medium text-graphite",
         size === "sm" ? "h-6 pr-2.5 pl-2 text-xs" : "h-7 pr-3 pl-2.5 text-[0.8125rem]",
         className,
       )}
     >
-      <Cctv aria-hidden className={cn("shrink-0 text-muted-foreground", size === "sm" ? "size-3.5" : "size-4")} />
+      <Cctv aria-hidden className={cn("shrink-0", size === "sm" ? "size-3.5" : "size-4")} />
       <span className="truncate">{name}</span>
     </span>
   );

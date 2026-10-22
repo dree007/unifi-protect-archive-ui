@@ -2,10 +2,11 @@
 
 import type { Translator } from "@/i18n/core";
 import { useI18n } from "@/i18n/provider";
-import { useId } from "react";
-import { SlidersHorizontal, X } from "lucide-react";
+import { useId, type ReactNode } from "react";
+import { Folder, FolderOpen, SlidersHorizontal, Star, X } from "lucide-react";
 import { cn } from "cn";
 
+import { CollectionsManager } from "@/components/archive/collections-manager";
 import { SearchInput } from "@/components/archive/search-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -86,10 +87,8 @@ function ChipGroup({
               onChange(option.value);
             }}
             className={cn(
-              "h-10 shrink-0 rounded-full px-4 text-sm font-medium whitespace-nowrap outline-none focus-visible:ring-3 focus-visible:ring-ring",
-              active
-                ? "surface-selected font-semibold"
-                : "surface-control text-foreground/80 hover:bg-surface-muted hover:text-foreground",
+              "h-10 pointer-coarse:h-11 shrink-0 rounded-full px-4 text-sm font-medium whitespace-nowrap outline-none focus-ring",
+              active ? "surface-selected" : "surface-control",
             )}
           >
             {option.label}
@@ -119,6 +118,65 @@ function OnlyDetectedSwitch({ filters, onChange }: { filters: ArchiveFilters; on
   );
 }
 
+/**
+ * Favorites and collections as a row of their own, visible on every screen size: the quickest
+ * way back to curated situations. "Favoriten" and one collection can be combined; pressing an
+ * active chip again clears it. A filtered collection that no longer exists stays visible as such.
+ */
+function CollectionsRow({
+  filters,
+  collections,
+  onChange,
+  manageButton,
+}: {
+  filters: ArchiveFilters;
+  collections: readonly FilterOption[];
+  onChange: (patch: Partial<ArchiveFilters>) => void;
+  manageButton: ReactNode;
+}) {
+  const { t } = useI18n();
+  const missing = filters.collectionId !== "all" && !collections.some((collection) => collection.value === filters.collectionId);
+  const chips = [...collections, ...(missing ? [{ value: filters.collectionId, label: t("collections.unknown") }] : [])];
+  const chip = (active: boolean) =>
+    cn(
+      "inline-flex h-10 pointer-coarse:h-11 shrink-0 items-center gap-2 rounded-full px-4 text-sm font-medium whitespace-nowrap outline-none focus-ring",
+      active ? "surface-selected" : "surface-control",
+    );
+  return (
+    <div
+      role="group"
+      aria-label={t("collections.title")}
+      className="scrollbar-none -mx-4 flex gap-2 overflow-x-auto px-4 py-1 sm:mx-0 sm:flex-wrap sm:px-0"
+    >
+      <button
+        type="button"
+        aria-pressed={filters.favorites}
+        onClick={() => onChange({ favorites: !filters.favorites })}
+        className={chip(filters.favorites)}
+      >
+        <Star aria-hidden className={cn("size-4", filters.favorites && "fill-current")} />
+        {t("favorites.chip")}
+      </button>
+      {chips.map((collection) => {
+        const active = filters.collectionId === collection.value;
+        return (
+          <button
+            key={collection.value}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onChange({ collectionId: active ? "all" : collection.value })}
+            className={chip(active)}
+          >
+            <Folder aria-hidden className="size-4" />
+            {collection.label}
+          </button>
+        );
+      })}
+      {manageButton}
+    </div>
+  );
+}
+
 function FilterSelect({
   label,
   value,
@@ -137,8 +195,8 @@ function FilterSelect({
       <SelectTrigger
         aria-label={label}
         className={cn(
-          "surface-control h-10 rounded-full border-transparent px-4 hover:bg-surface-muted",
-          value !== "all" && "surface-selected font-semibold",
+          "h-10 pointer-coarse:h-11 rounded-full border-transparent px-4 font-medium",
+          value !== "all" ? "surface-selected" : "surface-control",
           className,
         )}
       >
@@ -155,7 +213,7 @@ function FilterSelect({
   );
 }
 
-/** Removable chips for the active refinements (calm summary under the bar). */
+/** Removable chips for the active refinements of the filter sheet (calm summary under the bar). */
 function ActiveFilters({
   filters,
   cameras,
@@ -190,7 +248,7 @@ function ActiveFilters({
           <button
             type="button"
             onClick={() => onChange(chip.clear)}
-            className="surface-selected inline-flex h-9 items-center gap-1.5 rounded-full pr-2.5 pl-3.5 text-sm font-medium outline-none hover:brightness-[0.98] focus-visible:ring-3 focus-visible:ring-ring"
+            className="surface-selected inline-flex h-9 pointer-coarse:h-11 items-center gap-1.5 rounded-full pr-2.5 pl-3.5 text-sm font-medium outline-none focus-ring"
             aria-label={t("filters.remove", { label: chip.label })}
           >
             {chip.label}
@@ -211,9 +269,12 @@ interface FilterBarProps {
   onSearchSubmit: () => void;
   cameras: readonly FilterOption[];
   detectionTypes: readonly string[];
+  collections: readonly FilterOption[];
   rangeIssue?: CustomRangeIssue;
   onChange: (patch: Partial<ArchiveFilters>) => void;
   onReset: () => void;
+  /** Collections were created, renamed or deleted: reload the filter options. */
+  onCollectionsChanged: () => void;
 }
 
 /**
@@ -228,9 +289,11 @@ export function FilterBar({
   onSearchSubmit,
   cameras,
   detectionTypes,
+  collections,
   rangeIssue,
   onChange,
   onReset,
+  onCollectionsChanged,
 }: FilterBarProps) {
   const { t } = useI18n();
   const refinements = countRefinements(filters);
@@ -238,6 +301,21 @@ export function FilterBar({
   const toId = useId();
   const detections = detectionOptions(detectionTypes, t);
   const cameraChoices = cameraOptions(cameras, t);
+  const manageButton = (
+    <CollectionsManager
+      trigger={
+        <Button type="button" variant="ghost" className="shrink-0">
+          <FolderOpen data-icon="inline-start" aria-hidden />
+          {t("collections.manage")}
+        </Button>
+      }
+      onShow={(collectionId) => onChange({ collectionId })}
+      onChanged={onCollectionsChanged}
+      onDeleted={(collectionId) => {
+        if (collectionId === filters.collectionId) onChange({ collectionId: "all" });
+      }}
+    />
+  );
 
   const rangeIssueId = useId();
 
@@ -259,6 +337,8 @@ export function FilterBar({
       {filters.cameraId !== "all" && <input type="hidden" name="camera" value={filters.cameraId} />}
       {filters.detection !== "all" && <input type="hidden" name="type" value={filters.detection} />}
       {filters.onlyDetected && <input type="hidden" name="detected" value="1" />}
+      {filters.favorites && <input type="hidden" name="fav" value="1" />}
+      {filters.collectionId !== "all" && <input type="hidden" name="collection" value={filters.collectionId} />}
       <div className="flex gap-2">
         <SearchInput
           name="q"
@@ -273,32 +353,32 @@ export function FilterBar({
           <SheetTrigger asChild>
             <Button
               variant="outline"
-              className="surface-control relative h-12 rounded-full border-transparent px-4 hover:bg-surface-muted lg:hidden"
+              className="relative h-12 px-4 lg:hidden"
             >
               <SlidersHorizontal aria-hidden />
               <span className="sr-only sm:not-sr-only">{t("filters.title")}</span>
               {refinements > 0 && (
-                <span className="grid size-5 place-items-center rounded-full bg-selected-foreground text-[0.6875rem] font-semibold text-primary-foreground">
+                <span className="grid size-5 place-items-center rounded-full bg-violet-spark text-[0.6875rem] font-medium text-on-ink">
                   {refinements}
                   <span className="sr-only"> {t("filters.activeSuffix")}</span>
                 </span>
               )}
             </Button>
           </SheetTrigger>
-          <SheetContent side="bottom" className="max-h-[85dvh] gap-5 rounded-t-[1.75rem] border-none bg-card pb-safe shadow-[var(--shadow-elevated)]">
+          <SheetContent side="bottom" className="max-h-[85dvh] gap-5 rounded-t-card-lg border-none bg-card pb-safe">
             {/* Grab handle: a calm visual cue that the sheet can be dismissed. */}
-            <div aria-hidden className="mx-auto mt-3 h-1.5 w-10 rounded-full bg-border" />
+            <div aria-hidden className="mx-auto mt-3 h-1.5 w-10 rounded-full bg-stone" />
             <SheetHeader className="px-5 pt-0">
-              <SheetTitle className="text-lg">{t("filters.title")}</SheetTitle>
+              <SheetTitle>{t("filters.title")}</SheetTitle>
               <SheetDescription>{t("filters.description")}</SheetDescription>
             </SheetHeader>
             <div className="flex flex-col gap-6 overflow-y-auto px-5 py-1">
               <div className="flex flex-col gap-2.5">
-                <p className="text-sm font-semibold text-muted-foreground">{t("common.camera")}</p>
+                <p className="text-sm font-medium text-graphite">{t("common.camera")}</p>
                 <ChipGroup label={t("common.camera")} options={cameraChoices} value={filters.cameraId} onChange={(cameraId) => onChange({ cameraId })} />
               </div>
               <div className="flex flex-col gap-2.5">
-                <p className="text-sm font-semibold text-muted-foreground">{t("status.matched")}</p>
+                <p className="text-sm font-medium text-graphite">{t("status.matched")}</p>
                 <ChipGroup label={t("status.matched")} options={detections} value={filters.detection} onChange={(detection) => onChange({ detection })} />
               </div>
               <OnlyDetectedSwitch filters={filters} onChange={onChange} />
@@ -316,6 +396,8 @@ export function FilterBar({
           </SheetContent>
         </Sheet>
       </div>
+
+      <CollectionsRow filters={filters} collections={collections} onChange={onChange} manageButton={manageButton} />
 
       <div className="flex flex-wrap items-center gap-x-3 gap-y-3">
         <ChipGroup
@@ -351,7 +433,7 @@ export function FilterBar({
         <div className="flex flex-col gap-2">
           <div className="grid grid-cols-2 gap-3 sm:max-w-md">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor={fromId} className="text-xs text-muted-foreground">
+              <Label htmlFor={fromId} className="text-xs">
                 {t("filters.from")}
               </Label>
               <Input
@@ -366,7 +448,7 @@ export function FilterBar({
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor={toId} className="text-xs text-muted-foreground">
+              <Label htmlFor={toId} className="text-xs">
                 {t("filters.to")}
               </Label>
               <Input

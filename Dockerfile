@@ -1,4 +1,4 @@
-# Unifi Protect Archive UI – production image (docs/selfhosting.md). ONE image for every role:
+# Protect Archive UI – production image (docs/selfhosting.md). ONE image for every role:
 #   web       node server.js                        (Next.js standalone server, port 3000)
 #   worker    node cli/worker-run.mjs               (background worker, no ports)
 #   migrate   node cli/migrate.mjs                  (one-shot schema migration)
@@ -40,7 +40,7 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/* \
   && ffmpeg -version | head -n 1
 
-ARG RELEASE_VERSION=1.1.0
+ARG RELEASE_VERSION=2.0.0
 ARG SOURCE_URL=https://github.com/dree007/unifi-protect-archive-ui
 ARG SOURCE_REVISION=
 ARG SOURCE_DIGEST=
@@ -57,7 +57,7 @@ ENV NODE_ENV=production \
     IMAGE_SOURCE_URL=${SOURCE_DOWNLOAD_URL} \
     APP_BUILD_VERSION=${RELEASE_VERSION}
 WORKDIR /app
-LABEL org.opencontainers.image.title="Unifi Protect Archive UI" \
+LABEL org.opencontainers.image.title="Protect Archive UI" \
       org.opencontainers.image.description="Read-only NAS archive browser for exported UniFi Protect recordings" \
       org.opencontainers.image.version="${RELEASE_VERSION}" \
       org.opencontainers.image.licenses="AGPL-3.0-only" \

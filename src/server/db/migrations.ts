@@ -78,7 +78,7 @@ export async function runMigrations(
         // Drizzle would silently skip everything; starting an older app on a newer schema is
         // not supported (no downgrades) – say so instead of reporting "up to date".
         throw new MigrationError(
-          "The database was migrated by a newer version of Unifi Protect Archive UI than this one. Downgrades are not " +
+          "The database was migrated by a newer version of Protect Archive UI than this one. Downgrades are not " +
             "supported: start the newer version again, or restore a backup taken before the update.",
         );
       }

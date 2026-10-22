@@ -13,7 +13,7 @@ function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="surface-inset flex flex-col gap-0.5 px-3 py-2.5">
       <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="text-base font-semibold tabular-nums">{value}</dd>
+      <dd className="text-base font-medium tabular-nums">{value}</dd>
     </div>
   );
 }
@@ -27,14 +27,14 @@ export function CameraCard({ camera }: { camera: CameraViewModel }) {
         <span
           aria-hidden
           className={cn(
-            "grid size-12 shrink-0 place-items-center rounded-[var(--radius-control)]",
-            camera.online ? "bg-pastel-lavender text-pastel-lavender-ink" : "bg-pastel-neutral text-pastel-neutral-ink",
+            "grid size-12 shrink-0 place-items-center rounded-sm",
+            camera.online ? "bg-violet-soft text-violet-ink" : "bg-stone text-graphite",
           )}
         >
           <Cctv className="size-6" />
         </span>
         <div className="min-w-0 flex-1">
-          <h2 id={headingId} className="truncate text-lg font-semibold tracking-tight">
+          <h2 id={headingId} className="truncate type-heading">
             {camera.name}
           </h2>
           <p className="truncate text-sm text-muted-foreground">
@@ -61,7 +61,7 @@ export function CameraCard({ camera }: { camera: CameraViewModel }) {
       )}
 
       <div className="flex flex-col gap-2">
-        <h3 className="text-xs font-medium text-muted-foreground">{t("cameras.smartDetections")}</h3>
+        <h3 className="text-xs font-medium text-graphite">{t("cameras.smartDetections")}</h3>
         {camera.smartDetectTypes.length > 0 ? (
           <div className="flex flex-wrap gap-1.5">
             {camera.smartDetectTypes.map((type) => (
@@ -83,7 +83,7 @@ export function CameraCard({ camera }: { camera: CameraViewModel }) {
         {camera.protectStateLabel && (
           <>
             <dt>{t("cameras.protectStatus")}</dt>
-            <dd className="text-foreground/80">{camera.protectStateLabel === "Connected" ? t("status.connected") : camera.protectStateLabel === "Disconnected" ? t("status.disconnected") : camera.protectStateLabel === "Firmware updating" ? t("status.firmwareUpdating") : camera.protectStateLabel}</dd>
+            <dd className="text-graphite">{camera.protectStateLabel === "Connected" ? t("status.connected") : camera.protectStateLabel === "Disconnected" ? t("status.disconnected") : camera.protectStateLabel === "Firmware updating" ? t("status.firmwareUpdating") : camera.protectStateLabel}</dd>
           </>
         )}
         <dt>{t("cameras.deviceId")}</dt>

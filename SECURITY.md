@@ -1,6 +1,6 @@
 # Security policy
 
-Unifi Protect Archive UI stores and serves private camera recordings. It has **no integrated user
+Protect Archive UI stores and serves private camera recordings. It has **no integrated user
 login, sessions or per-camera authorization**. Access to its web port grants access to the archive
 and private APIs. The project is an independent third-party application, not an official Ubiquiti
 service.
