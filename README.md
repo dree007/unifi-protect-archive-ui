@@ -31,8 +31,8 @@ Everything else (database, ffmpeg, Node.js) is included in the containers.
 
 ```bash
 mkdir unifi-archive && cd unifi-archive
-curl -fsSLO https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v2.0.0/docker-compose.yml
-curl -fsSL -o .env https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v2.0.0/.env.example
+curl -fsSLO https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v2.0.1/docker-compose.yml
+curl -fsSL -o .env https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v2.0.1/.env.example
 chmod 600 .env
 ```
 
@@ -66,7 +66,7 @@ Read [SECURITY.md](SECURITY.md) before you install.
 
 ## Support
 
-Version 2.0.0 is built and tested for Linux amd64 with synthetic recordings and a simulated
+Version 2.0.1 is built and tested for Linux amd64 with synthetic recordings and a simulated
 Protect console. Real NAS setups, Protect versions, HTTPS proxies and single sign-on vary and are
 not individually tested.
 

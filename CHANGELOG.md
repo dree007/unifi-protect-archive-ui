@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.1
+
+Patch release. No database migration; upgrading from 2.0.0 only needs the new image.
+
+### Changed
+
+- New logo: a stack of archive folders with a play button, drawn in the Atelier Soft colors. It
+  replaces the camera icon in the sidebar and as the browser tab icon.
+- The README screenshots show calm, lightly pixelated illustrated scenes instead of video test
+  patterns.
+
 ## 2.0.0
 
 Major release: a new name, a new visual design and a database migration.
