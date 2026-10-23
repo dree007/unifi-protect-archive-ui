@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.1.0
+
+No database migration.
+
+### Added
+
+- Dark mode: a sun–moon switch at the bottom of the sidebar (a round button in the mobile top
+  bar). Without a choice the app follows the system setting; the choice is kept per browser.
+  The logo and the browser tab icon adapt to the dark theme.
+- Optional built-in login: set `APP_LOGIN_USERNAME` and `APP_LOGIN_PASSWORD` to require a
+  sign-in for every page and API (health check excepted), with a sign-out button. Without them
+  nothing changes and there is no login screen. See docs/security.md.
+- The desktop sidebar folds to an icon rail with a small handle on its edge and remembers the
+  state per browser.
+
+### Changed
+
+- A little more color: pastel hues for the navigation icons, the dashboard figures, detection
+  types (badges, bars and the latest-detection card) and camera icons. "Fine" states such as
+  running or online are now sage green instead of violet.
+
 ## 2.0.1
 
 Patch release. No database migration; upgrading from 2.0.0 only needs the new image.

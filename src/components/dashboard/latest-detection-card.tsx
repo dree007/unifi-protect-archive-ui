@@ -13,14 +13,17 @@ import type { LatestDetectionModel } from "@/lib/view-models";
 export function LatestDetectionCard({ detection, className }: { detection: LatestDetectionModel | null; className?: string }) {
   const { t } = useI18n();
   const [primary] = detection?.detectionTypes ?? [];
-  const Icon = primary ? detectionStyle(primary).icon : Sparkles;
+  const style = primary ? detectionStyle(primary) : null;
+  const Icon = style?.icon ?? Sparkles;
 
   return (
     <section
       aria-labelledby="latest-detection"
       className={cn(
-        // The hero card: the warm-taupe level with a 32 px radius and only the light top edge.
-        "flex flex-col justify-between gap-6 rounded-card-lg bg-surface-muted p-5 text-foreground shadow-highlight sm:p-7",
+        // The hero card: a 32 px radius and only the light top edge, tinted in the pastel hue of
+        // the newest detection (warm taupe without one).
+        "flex flex-col justify-between gap-6 rounded-card-lg p-5 text-foreground shadow-highlight sm:p-7",
+        style?.surface ?? "bg-surface-muted",
         className,
       )}
     >
@@ -28,7 +31,7 @@ export function LatestDetectionCard({ detection, className }: { detection: Lates
         <h2 id="latest-detection" className="text-sm font-medium text-graphite">
           {t("dashboard.latest")}
         </h2>
-        <span className="grid size-11 place-items-center rounded-full bg-card text-ink">
+        <span className={cn("grid size-11 place-items-center rounded-full bg-card", style?.ink ?? "text-ink")}>
           <Icon aria-hidden className="size-5" />
         </span>
       </div>

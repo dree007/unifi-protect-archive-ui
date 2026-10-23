@@ -31,8 +31,8 @@ export default async function DashboardPage() {
         <>
           <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             <LatestDetectionCard detection={dashboard.latestDetection} className="col-span-2 lg:row-span-2" />
-            <StatCard label={t("common.today")} value={formatNumber(dashboard.eventsToday, locale)} unit={t("units.events", { count: dashboard.eventsToday })} icon={CalendarCheck} tone="info" />
-            <StatCard label={t("common.archive")} value={formatNumber(dashboard.clipsTotal, locale)} unit={t("units.clips", { count: dashboard.clipsTotal })} icon={Film} tone="neutral" />
+            <StatCard label={t("common.today")} value={formatNumber(dashboard.eventsToday, locale)} unit={t("units.events", { count: dashboard.eventsToday })} icon={CalendarCheck} tone="sky" />
+            <StatCard label={t("common.archive")} value={formatNumber(dashboard.clipsTotal, locale)} unit={t("units.clips", { count: dashboard.clipsTotal })} icon={Film} tone="butter" />
             <StatCard
               label={t("common.cameras")}
               value={formatNumber(dashboard.camerasOnline, locale)}
@@ -49,7 +49,7 @@ export default async function DashboardPage() {
                   : t("dashboard.noScan")
               }
               icon={HardDrive}
-              tone={dashboard.lastScanFailed ? "warning" : "neutral"}
+              tone={dashboard.lastScanFailed ? "warning" : "rose"}
             />
           </div>
 

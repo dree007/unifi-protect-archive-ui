@@ -11,7 +11,7 @@ interface EmptyStateProps {
 export function EmptyState({ icon: Icon, title, description, action }: EmptyStateProps) {
   return (
     <div className="surface-card flex flex-col items-center gap-3 px-6 py-14 text-center">
-      <span className="grid size-14 place-items-center rounded-md bg-stone text-ink">
+      <span className="grid size-14 place-items-center rounded-md bg-violet-soft text-violet-ink">
         <Icon aria-hidden className="size-7" />
       </span>
       <h2 className="type-heading">{title}</h2>

@@ -1,8 +1,9 @@
 # Selfhosted access boundary
 
-Protect Archive UI contains private camera footage and has no integrated user/session management.
-The default is direct access on all IPv4 host interfaces, intended only for a trusted, restricted
-LAN. It provides no authentication or HTTPS. Protected proxy mode is an explicit alternative.
+Protect Archive UI contains private camera footage. The default is direct access on all IPv4
+host interfaces without login, intended only for a trusted, restricted LAN. An optional
+[built-in login](#built-in-login) adds one account; it provides no HTTPS. Protected proxy mode is
+an explicit alternative and can be combined with it.
 Use Linux, Docker Engine **>=28.0.0**, and the Compose plugin **>=5.6.0** (the tested baseline).
 Check the daemon with `docker version --format '{{.Server.Version}}'`, and the plugin separately
 with `docker compose version`. The CLI version alone says nothing about the daemon.
@@ -24,6 +25,42 @@ conditional requests and alternative URLs. Never exempt `/api/` from the authent
 Caddy + Authentik, Caddy + Authelia, authenticated nginx or a carefully restricted VPN can supply
 the external boundary. A VPN grants its admitted peers network access; it does not create app
 users/per-camera permissions. Client-supplied identity headers are not authentication.
+
+## Built-in login
+
+Set both variables in `.env` and recreate the web container (`docker compose up -d web`):
+
+```dotenv
+APP_LOGIN_USERNAME=admin
+APP_LOGIN_PASSWORD='a-long-random-password'   # e.g. openssl rand -base64 18
+```
+
+With both empty or missing there is no login and `/login` redirects to the dashboard. With only
+one of them set the configuration is treated as an error: every request, the health check
+included, gets `503`, so a typo never leaves the archive silently open.
+
+What it does:
+
+- The gate (`src/proxy.ts`) runs before every route. Without a valid session pages redirect to
+  `/login` (and back to the requested page after sign-in); `/api/*` routes, including video and
+  thumbnail GET, HEAD and byte-range requests, and server functions answer `401` without any
+  media headers. Public are only `/login` and `/api/health` (status `ok`/`degraded`, needed by
+  the container health check). Server functions check the session a second time.
+- Credentials are compared in constant time. The password is never stored: a 32-byte key is
+  derived from username and password with scrypt (N = 2^15) and signs the session cookie
+  `archive_session` (HMAC-SHA256, `HttpOnly`, `SameSite=Lax`, `Secure` on HTTPS, valid 30 days).
+  Changing the username or password signs every browser out; a restart does not.
+- After 10 failed attempts within 15 minutes, counted for all clients together, further attempts
+  are refused until the oldest failure is 15 minutes old. Someone guessing can therefore also
+  lock out the real user for that time.
+- "Sign out" (sidebar, mobile footer) deletes the cookie in that browser. There is no server-side
+  session list, so a copied cookie stays valid until it expires or the password changes.
+
+Limits: one shared account, no roles or per-camera rights, no 2FA. On plain HTTP the password and
+the session cookie cross the network unencrypted, so use HTTPS (a reverse proxy) for anything
+beyond a trusted LAN. Choose a long random password: the cookie signature allows offline
+guessing, which scrypt only slows down. For Internet access an identity provider in front (the
+Caddy + Authentik example below) remains the stronger choice.
 
 ## Direct access on a trusted LAN
 

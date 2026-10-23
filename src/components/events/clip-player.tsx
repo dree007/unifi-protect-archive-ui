@@ -163,7 +163,7 @@ function ClipVideo({ clip }: { clip: ClipModel }) {
   if (state === "unavailable" || state === "unsupported") {
     const { title, text } = FAILURE_TEXT[state];
     return (
-      <div role="status" className="flex aspect-video flex-col items-center justify-center gap-2 px-6 text-center text-on-ink">
+      <div role="status" className="flex aspect-video flex-col items-center justify-center gap-2 px-6 text-center text-on-media">
         <VideoOff aria-hidden className="size-8 opacity-70" />
         <p className="font-medium">{t(title)}</p>
         <p className="max-w-sm text-sm opacity-75">

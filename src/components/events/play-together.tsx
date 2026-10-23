@@ -248,7 +248,7 @@ function SlotVideo({
   if (state === "unavailable" || state === "unsupported") {
     const { title, text } = FAILURE_TEXT[state];
     return (
-      <div role="status" className="flex aspect-video flex-col items-center justify-center gap-2 rounded-md bg-media px-6 text-center text-on-ink">
+      <div role="status" className="flex aspect-video flex-col items-center justify-center gap-2 rounded-md bg-media px-6 text-center text-on-media">
         <VideoOff aria-hidden className="size-7 opacity-70" />
         <p className="font-medium">{t(title)}</p>
         <p className="max-w-sm text-sm opacity-75">{t(text)}</p>
@@ -282,13 +282,13 @@ function SlotVideo({
         className={cn("size-full object-contain transition-opacity duration-300", idle && "opacity-40")}
       />
       {state === "loading" && (
-        <span className="absolute top-2 right-2 grid size-8 place-items-center rounded-full bg-media/70 text-on-ink">
+        <span className="absolute top-2 right-2 grid size-8 place-items-center rounded-full bg-media/70 text-on-media">
           <Loader2 aria-hidden className="size-4 animate-spin motion-reduce:animate-none" />
           <span className="sr-only">{t("together.loading")}</span>
         </span>
       )}
       {idle && (
-        <p role="status" className="absolute inset-x-0 bottom-0 m-2 self-end rounded-full bg-media/75 px-3 py-1.5 text-center text-sm font-medium text-on-ink tabular-nums">
+        <p role="status" className="absolute inset-x-0 bottom-0 m-2 self-end rounded-full bg-media/75 px-3 py-1.5 text-center text-sm font-medium text-on-media tabular-nums">
           {phase.phase === "before" ? t("together.startsAt", { time: formatTime(phase.startsAtMs) }) : t("together.endedAt", { time: formatTime(phase.endedAtMs) })}
         </p>
       )}

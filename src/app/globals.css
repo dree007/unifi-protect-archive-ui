@@ -6,14 +6,17 @@
 
 /*
  * Design tokens – "Atelier Soft" (DESIGN.md). Components use these names – never raw color
- * values or ad-hoc shadows/radii. Light theme only.
+ * values or ad-hoc shadows/radii. Every color is a light-dark() pair: the light value is the
+ * paper by day, the dark value the same atelier at night. `color-scheme` on <html> picks one
+ * (class "light"/"dark" from the theme toggle, otherwise the system preference).
  *
  *   palette    eggshell (page) · eggshell-raised (raised surfaces) · warm-taupe (second level)
  *              · stone (plates, tracks, pressed) · line / line-control (hairlines, field borders)
- *              · ink · graphite · smoke · ash (text) · violet / ember (the only two accents)
+ *              · ink · graphite · smoke · ash (text) · violet / ember (the two accents)
+ *              · sage / sky / butter / rose (pastel hues for icons, plates and bars)
  *   semantic   background · card · popover · surface-muted · foreground · muted-foreground ·
  *              primary (ink, the one primary action) · selected (violet tint) · media (video)
- *   status     success (violet) · warning (ember tint) · danger (ember ink) · neutral · info
+ *   status     success (sage) · warning (ember tint) · danger (ember ink) · neutral · info
  *   shape      radius-xs 8 · sm 12 (inputs, menus) · md 16 (small cards, insets) · card 24 ·
  *              card-lg 32 · full (buttons, tags, tabs)
  *   depth      shadow-highlight · shadow-soft-sm/-md/-lg · shadow-pressed · shadow-ink
@@ -40,6 +43,20 @@
   --color-ember-orange: var(--ember-orange);
   --color-ember-soft: var(--ember-soft);
   --color-ember-ink: var(--ember-ink);
+  --color-sage: var(--sage);
+  --color-sage-soft: var(--sage-soft);
+  --color-sage-ink: var(--sage-ink);
+  --color-sky: var(--sky);
+  --color-sky-soft: var(--sky-soft);
+  --color-sky-ink: var(--sky-ink);
+  --color-butter: var(--butter);
+  --color-butter-soft: var(--butter-soft);
+  --color-butter-ink: var(--butter-ink);
+  --color-rose: var(--rose);
+  --color-rose-soft: var(--rose-soft);
+  --color-rose-ink: var(--rose-ink);
+  --color-on-media: var(--on-media);
+  --color-scrim: var(--scrim);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -84,34 +101,49 @@
   --radius-card: 24px;
   --radius-card-lg: 32px;
 
-  --shadow-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  --shadow-soft-sm: 0 0 0 1px rgba(70, 52, 32, 0.06), 0 1px 2px rgba(70, 52, 32, 0.06), 0 4px 10px rgba(70, 52, 32, 0.05);
-  --shadow-soft-md: 0 0 0 1px rgba(70, 52, 32, 0.05), 0 2px 4px rgba(70, 52, 32, 0.04), 0 12px 28px rgba(70, 52, 32, 0.08);
-  --shadow-soft-lg: 0 0 0 1px rgba(70, 52, 32, 0.04), 0 4px 8px rgba(70, 52, 32, 0.04), 0 24px 56px rgba(70, 52, 32, 0.12);
-  --shadow-pressed: inset 0 2px 4px rgba(70, 52, 32, 0.1), inset 0 0 0 1px rgba(70, 52, 32, 0.06);
-  --shadow-ink: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 1px 2px rgba(22, 18, 14, 0.24), 0 6px 16px rgba(22, 18, 14, 0.16);
+  --shadow-highlight: inset 0 1px 0 light-dark(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.05));
+  --shadow-soft-sm: 0 0 0 1px light-dark(rgba(70, 52, 32, 0.06), rgba(255, 255, 255, 0.05)), 0 1px 2px light-dark(rgba(70, 52, 32, 0.06), rgba(0, 0, 0, 0.3)), 0 4px 10px light-dark(rgba(70, 52, 32, 0.05), rgba(0, 0, 0, 0.25));
+  --shadow-soft-md: 0 0 0 1px light-dark(rgba(70, 52, 32, 0.05), rgba(255, 255, 255, 0.06)), 0 2px 4px light-dark(rgba(70, 52, 32, 0.04), rgba(0, 0, 0, 0.3)), 0 12px 28px light-dark(rgba(70, 52, 32, 0.08), rgba(0, 0, 0, 0.4));
+  --shadow-soft-lg: 0 0 0 1px light-dark(rgba(70, 52, 32, 0.04), rgba(255, 255, 255, 0.06)), 0 4px 8px light-dark(rgba(70, 52, 32, 0.04), rgba(0, 0, 0, 0.3)), 0 24px 56px light-dark(rgba(70, 52, 32, 0.12), rgba(0, 0, 0, 0.5));
+  --shadow-pressed: inset 0 2px 4px light-dark(rgba(70, 52, 32, 0.1), rgba(0, 0, 0, 0.35)), inset 0 0 0 1px light-dark(rgba(70, 52, 32, 0.06), rgba(255, 255, 255, 0.04));
+  --shadow-ink: inset 0 1px 0 light-dark(rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.5)), 0 1px 2px light-dark(rgba(22, 18, 14, 0.24), rgba(0, 0, 0, 0.4)), 0 6px 16px light-dark(rgba(22, 18, 14, 0.16), rgba(0, 0, 0, 0.3));
 }
 
 :root {
-  /* palette (tokens.json of the Atelier Soft reference) */
-  --eggshell: #fdfbf7;
-  --eggshell-raised: #fffdfa;
-  --warm-taupe: #f5efe8;
-  --stone: #ebe3d9;
-  --line: #e3d9cc;
-  --line-control: #968470; /* field borders: 3.5:1 on eggshell */
-  --ink: #16120e;
-  --ink-hover: #2a231c; /* hover of the ink-filled primary button */
-  --graphite: #463a2f; /* labels: 10.7:1 on eggshell, 8.7:1 on stone */
-  --smoke: #6f6255; /* secondary text: 5.7:1 on eggshell, 4.6:1 on stone */
-  --ash: #9a8c7c; /* placeholders and decoration only – 3.2:1, never small body text */
-  --on-ink: #fdfbf7;
-  --violet-spark: #3a36ff;
-  --violet-soft: #ebeaff;
-  --violet-ink: #2f2ae0;
-  --ember-orange: #ff4a0d;
-  --ember-soft: #ffe8dc;
-  --ember-ink: #c2370a;
+  color-scheme: light dark;
+
+  /* palette: light-dark(day, night); day values from tokens.json of the Atelier Soft reference */
+  --eggshell: light-dark(#fdfbf7, #15120f);
+  --eggshell-raised: light-dark(#fffdfa, #221e19);
+  --warm-taupe: light-dark(#f5efe8, #1b1814);
+  --stone: light-dark(#ebe3d9, #2e2923);
+  --line: light-dark(#e3d9cc, #37312a);
+  --line-control: light-dark(#968470, #85786a); /* field borders: 3.5:1 on the page */
+  --ink: light-dark(#16120e, #f4eee6);
+  --ink-hover: light-dark(#2a231c, #ddd5ca); /* hover of the ink-filled primary button */
+  --graphite: light-dark(#463a2f, #d9cfc2); /* labels: 10.7:1 on eggshell, 8.7:1 on stone */
+  --smoke: light-dark(#6f6255, #ada092); /* secondary text: ≥ 4.6:1 on every surface */
+  --ash: light-dark(#9a8c7c, #7c7064); /* placeholders and decoration only, never small body text */
+  --on-ink: light-dark(#fdfbf7, #16120e);
+  --violet-spark: light-dark(#3a36ff, #8f8cff);
+  --violet-soft: light-dark(#ebeaff, #2a2852);
+  --violet-ink: light-dark(#2f2ae0, #c4c2ff);
+  --ember-orange: light-dark(#ff4a0d, #ff7b47);
+  --ember-soft: light-dark(#ffe8dc, #3e2318);
+  --ember-ink: light-dark(#c2370a, #ffae8c);
+  /* pastel hues: a solid for bars and dots, a soft tint for plates, an ink for icons and text */
+  --sage: light-dark(#5fb27c, #6cc28a);
+  --sage-soft: light-dark(#e2f0e4, #1f3326);
+  --sage-ink: light-dark(#2c6a43, #a6dcb5);
+  --sky: light-dark(#5d9fd8, #6aaee6);
+  --sky-soft: light-dark(#e1edf9, #1b2c3d);
+  --sky-ink: light-dark(#1f5d94, #a9cff2);
+  --butter: light-dark(#e3b941, #e6c055);
+  --butter-soft: light-dark(#faefcc, #3a3018);
+  --butter-ink: light-dark(#75560a, #f0d58a);
+  --rose: light-dark(#e88aa2, #ea8ea6);
+  --rose-soft: light-dark(#fbe3ea, #3d2129);
+  --rose-ink: light-dark(#9e3450, #f5b3c4);
   --focus-ring: var(--violet-spark);
 
   /* surfaces: eggshell page, raised eggshell surfaces carried by soft shadows, taupe insets */
@@ -122,8 +154,11 @@
   --popover-foreground: var(--ink);
   --surface-muted: var(--warm-taupe);
   --muted: var(--warm-taupe);
-  /* video area: warm ink instead of black */
-  --media: var(--ink);
+  /* video area: warm ink instead of black, in both themes; text on it stays light */
+  --media: light-dark(#16120e, #0d0b09);
+  --on-media: #fdfbf7;
+  /* backdrop behind sheets and dialogs */
+  --scrim: light-dark(rgba(22, 18, 14, 0.2), rgba(0, 0, 0, 0.55));
 
   /* text */
   --foreground: var(--ink);
@@ -141,8 +176,8 @@
   --selected-foreground: var(--violet-ink);
 
   /* status: tint + ink text, always with icon and label */
-  --success-soft: var(--violet-soft);
-  --success-strong: var(--violet-ink);
+  --success-soft: var(--sage-soft);
+  --success-strong: var(--sage-ink);
   --warning-soft: var(--ember-soft);
   --warning-strong: var(--ember-ink);
   --danger-soft: var(--ember-soft);
@@ -156,6 +191,14 @@
   --border: var(--line);
   --input: var(--line-control);
   --ring: var(--focus-ring); /* 6.5:1 on eggshell */
+}
+
+/* Explicit choice from the theme toggle; without it the system preference decides. */
+:root.light {
+  color-scheme: light;
+}
+:root.dark {
+  color-scheme: dark;
 }
 
 @layer base {

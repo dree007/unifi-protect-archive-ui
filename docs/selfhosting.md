@@ -22,8 +22,8 @@ in the containers and do not need to be installed on the host.
 # Check the SERVER Engine version, not just the Docker client version.
 docker version --format '{{.Server.Version}}'
 docker compose version
-curl -fsSLO https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v2.0.1/docker-compose.yml
-curl -fsSL -o .env https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v2.0.1/.env.example
+curl -fsSLO https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v2.1.0/docker-compose.yml
+curl -fsSL -o .env https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v2.1.0/.env.example
 chmod 600 .env
 # Edit .env: set POSTGRES_PASSWORD and NAS_ARCHIVE_HOST_PATH.
 docker compose up -d
@@ -34,7 +34,7 @@ Open **http://<docker-host-ip>:3100** from a permitted LAN device. No extra bind
 SSH tunnel, proxy, DNS entry or router forwarding is required in the default LAN mode.
 Protect is optional: leave its settings empty for NAS-only use.
 The first startup pulls the ready-made image, creates the schema and starts indexing; no demo data is inserted.
-The default image is `ghcr.io/dree007/unifi-protect-archive-ui:2.0.1`, Linux amd64. It is pulled
+The default image is `ghcr.io/dree007/unifi-protect-archive-ui:2.1.0`, Linux amd64. It is pulled
 anonymously; no registry account, source tree or local compilation is needed.
 `migrate` exiting with code **0** is normal.
 
@@ -46,8 +46,9 @@ using the [security checklist](security.md). No separate preflight script is nee
 commands above and `docker compose config -q` validate the installation without duplicating
 Compose environment parsing or printing interpolated credentials.
 
-**Access protection is required for untrusted/public access.** The app has no complete user
-login system and contains private footage. The default opens all IPv4 host interfaces;
+**Access protection is required for untrusted/public access.** The app contains private footage
+and by default has no login; the optional [built-in login](security.md#built-in-login) adds one
+account but no HTTPS. The default opens all IPv4 host interfaces;
 firewall, VLAN and routing rules determine the actual audience. Plain HTTP is unencrypted.
 Do not forward this port from your router or expose it directly to the public Internet.
 
@@ -86,6 +87,7 @@ Empty or missing optional values use the defaults below.
 | `UNIFI_ARCHIVE_BIND_IP` | `0.0.0.0` | All IPv4 host interfaces; optionally loopback or a specific host IPv4 address |
 | `UNIFI_ARCHIVE_PORT` | `3100` | Published web port on the configured host IP |
 | `APP_TIME_ZONE` | `Europe/Berlin` | Display and calendar boundaries (IANA name) |
+| `APP_LOGIN_USERNAME`, `APP_LOGIN_PASSWORD` | empty | Optional built-in login: set both to require sign-in for every page and API; leave both empty for none. Only one set: every request is refused (503) |
 | `APP_SOURCE_URL` | empty override | Optional exact-source URL override; an approved image can supply its built-in matching source location |
 | `PROTECT_COLLECTOR_ENABLED` | `auto` | `false`: off; `true`: require settings; `auto`: use if configured |
 | `UNIFI_PROTECT_URL`, `UNIFI_PROTECT_API_KEY` | empty | Optional Protect console URL and Integration API key |
@@ -300,7 +302,8 @@ Fingerprinted Next.js assets retain their usual immutable cache policy.
 The persistent JPEG cache in the `thumbnails` volume remains enabled; HTTP storage prevention
 does not force repeated ffmpeg generation. Versioned media URLs and ETags remain valid.
 
-Protect Archive UI has no session/logout API. After Authentik or another gateway revokes access,
+Apart from the optional built-in login, Protect Archive UI has no session/logout API. After
+Authentik or another gateway revokes access,
 every new request must be denied before reaching the backend. Existing downloaded files,
 older HTTP cache entries, screenshots, already displayed frames and in-flight responses cannot
 be remotely erased by these headers. Close sensitive tabs/use a private browser profile on

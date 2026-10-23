@@ -6,13 +6,13 @@ import { setLocale } from "@/i18n/actions";
 import { LOCALES } from "@/i18n/core";
 import { useI18n } from "@/i18n/provider";
 
-export function LanguageToggle() {
+export function LanguageToggle({ orientation = "horizontal" }: { orientation?: "horizontal" | "vertical" }) {
   const { locale, t } = useI18n();
   const [pending, startTransition] = useTransition();
   const [failed, setFailed] = useState(false);
   return (
     <div className="relative shrink-0">
-      <div role="group" aria-label={t("navigation.language")} aria-busy={pending} className="surface-track flex p-1">
+      <div role="group" aria-label={t("navigation.language")} aria-busy={pending} className={cn("surface-track flex p-1", orientation === "vertical" && "flex-col")}>
         {LOCALES.map((option) => (
           <button key={option} type="button" aria-label={option === "de" ? "Deutsch" : "English"} aria-pressed={option === locale} disabled={pending}
             onClick={() => { if (option === locale) return; setFailed(false); startTransition(async () => { try { await setLocale(option); } catch { setFailed(true); } }); }}
@@ -21,7 +21,7 @@ export function LanguageToggle() {
           </button>
         ))}
       </div>
-      {failed && <p role="alert" className="absolute right-0 top-full z-50 mt-2 w-64 rounded-md bg-popover p-3 text-sm shadow-soft-md">{t("errors.language")}</p>}
+      {failed && <p role="alert" className={cn("absolute z-50 w-64 rounded-md bg-popover p-3 text-sm shadow-soft-md", orientation === "vertical" ? "bottom-0 left-full ml-3" : "right-0 top-full mt-2")}>{t("errors.language")}</p>}
     </div>
   );
 }

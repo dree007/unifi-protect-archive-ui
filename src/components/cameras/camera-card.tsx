@@ -28,7 +28,7 @@ export function CameraCard({ camera }: { camera: CameraViewModel }) {
           aria-hidden
           className={cn(
             "grid size-12 shrink-0 place-items-center rounded-sm",
-            camera.online ? "bg-violet-soft text-violet-ink" : "bg-stone text-graphite",
+            camera.online ? "bg-sky-soft text-sky-ink" : "bg-stone text-graphite",
           )}
         >
           <Cctv className="size-6" />

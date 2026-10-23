@@ -3,6 +3,7 @@ import { useI18n } from "@/i18n/provider";
 import { Car, Film, type LucideIcon, Package, PawPrint, RectangleEllipsis, ScanFace, Tag, User } from "lucide-react";
 import { cn } from "cn";
 
+import { HUE_CLASSES, type Hue } from "@/components/common/tone";
 import { detectionLabel } from "@/lib/labels";
 
 interface DetectionStyle {
@@ -11,21 +12,23 @@ interface DetectionStyle {
   badge: string;
   /** Solid color for bars and dots. */
   solid: string;
+  /** Tint alone and ink alone, for larger surfaces such as the latest-detection card. */
+  surface?: string;
+  ink?: string;
 }
 
 /**
- * The one place that styles detection types. Atelier Soft allows no extra accent colors, so
- * every known type shares the violet tint (violet ink on violet-soft, 7:1) and is told apart by
- * its icon and label – never by color.
+ * The one place that styles detection types. Each known type has its own pastel hue (ink on
+ * tint, ≥ 5.4:1); the icon and label still tell them apart – color is never the only carrier.
  */
-const DETECTED = { badge: "bg-violet-soft text-violet-ink", solid: "bg-violet-spark" };
+const hue = (name: Hue) => ({ badge: HUE_CLASSES[name].plate, solid: HUE_CLASSES[name].solid, surface: HUE_CLASSES[name].soft, ink: HUE_CLASSES[name].ink });
 const KNOWN_STYLES: Record<string, DetectionStyle> = {
-  person: { icon: User, ...DETECTED },
-  vehicle: { icon: Car, ...DETECTED },
-  animal: { icon: PawPrint, ...DETECTED },
-  package: { icon: Package, ...DETECTED },
-  face: { icon: ScanFace, ...DETECTED },
-  licensePlate: { icon: RectangleEllipsis, ...DETECTED },
+  person: { icon: User, ...hue("violet") },
+  vehicle: { icon: Car, ...hue("sky") },
+  animal: { icon: PawPrint, ...hue("sage") },
+  package: { icon: Package, ...hue("butter") },
+  face: { icon: ScanFace, ...hue("rose") },
+  licensePlate: { icon: RectangleEllipsis, ...hue("sky") },
 };
 
 /** Unknown/new Protect types: a neutral generic style. */

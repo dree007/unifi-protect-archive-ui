@@ -31,8 +31,8 @@ Everything else (database, ffmpeg, Node.js) is included in the containers.
 
 ```bash
 mkdir unifi-archive && cd unifi-archive
-curl -fsSLO https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v2.0.1/docker-compose.yml
-curl -fsSL -o .env https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v2.0.1/.env.example
+curl -fsSLO https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v2.1.0/docker-compose.yml
+curl -fsSL -o .env https://raw.githubusercontent.com/dree007/unifi-protect-archive-ui/v2.1.0/.env.example
 chmod 600 .env
 ```
 
@@ -53,9 +53,10 @@ right away. The common settings are explained in [.env.example](.env.example), a
 
 ## Keep it private
 
-The app has **no login** and uses plain HTTP. Anyone who can reach port 3100 can watch your
-recordings. Only use it in a trusted network, never forward the port from your router, and put
-an authenticating HTTPS proxy or VPN in front of it for any other access.
+By default the app has **no login** and uses plain HTTP: anyone who can reach port 3100 can
+watch your recordings. Set `APP_LOGIN_USERNAME` and `APP_LOGIN_PASSWORD` in `.env` for a simple
+built-in login. Only use it in a trusted network, never forward the port from your router, and
+put an HTTPS proxy or VPN in front of it for any other access.
 Read [SECURITY.md](SECURITY.md) before you install.
 
 ## Documentation
@@ -66,7 +67,7 @@ Read [SECURITY.md](SECURITY.md) before you install.
 
 ## Support
 
-Version 2.0.1 is built and tested for Linux amd64 with synthetic recordings and a simulated
+Version 2.1.0 is built and tested for Linux amd64 with synthetic recordings and a simulated
 Protect console. Real NAS setups, Protect versions, HTTPS proxies and single sign-on vary and are
 not individually tested.
 

@@ -3,21 +3,26 @@
 import { useI18n } from "@/i18n/provider";
 import { Cctv, GitMerge, HardDrive, Sparkles } from "lucide-react";
 
+import { HUE_CLASSES } from "@/components/common/tone";
+
 const STEPS = [
   {
     icon: HardDrive,
+    hue: HUE_CLASSES.butter.ink,
     title: "onboarding.scan",
     text: "onboarding.scanBody",
     command: "npm run archive:scan",
   },
   {
     icon: Cctv,
+    hue: HUE_CLASSES.sky.ink,
     title: "onboarding.cameras",
     text: "onboarding.camerasBody",
     command: "npm run protect:sync-cameras",
   },
   {
     icon: GitMerge,
+    hue: HUE_CLASSES.sage.ink,
     title: "onboarding.reconcile",
     text: "onboarding.reconcileBody",
     command: "npm run archive:reconcile",
@@ -30,7 +35,7 @@ export function Onboarding() {
   return (
     <section aria-labelledby="onboarding-title" className="surface-card overflow-hidden">
       <div className="flex flex-col gap-2 bg-surface-muted px-6 py-8 sm:px-8">
-        <span className="grid size-12 place-items-center rounded-sm bg-ink text-on-ink">
+        <span className="grid size-12 place-items-center rounded-sm bg-violet-soft text-violet-ink">
           <Sparkles aria-hidden className="size-6" />
         </span>
         <h2 id="onboarding-title" className="mt-3 type-heading">
@@ -47,7 +52,7 @@ export function Onboarding() {
               <span className="grid size-9 shrink-0 place-items-center rounded-full bg-card text-sm font-medium text-foreground">
                 {index + 1}
               </span>
-              <step.icon aria-hidden className="size-5 text-muted-foreground" />
+              <step.icon aria-hidden className={`size-5 ${step.hue}`} />
             </div>
             <div className="flex flex-col gap-1">
               <h3 className="font-medium">{t(step.title)}</h3>

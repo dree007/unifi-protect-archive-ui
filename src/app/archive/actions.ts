@@ -6,6 +6,7 @@ import type { CollectionSummary, CurationResult } from "@/lib/collections";
 import type { ArchivePageModel, EventDetailModel } from "@/lib/view-models";
 import { getArchivePage, getEventDetail } from "@/server/queries/archive";
 import { queryContext } from "@/server/queries/context";
+import { requireSession } from "@/server/auth/session";
 import {
   createCollection,
   deleteCollection,
@@ -23,6 +24,7 @@ import {
 
 /** Next page for "Mehr laden" (same filters as the URL, cursor from the previous page). */
 export async function loadMoreArchiveEvents(filterQuery: string, cursor: string): Promise<ArchivePageModel> {
+  await requireSession();
   const { locale } = await getI18n();
   const filters = parseArchiveFilters(new URLSearchParams(String(filterQuery).slice(0, 1000)));
   return getArchivePage(filters, String(cursor), queryContext({ locale }));
@@ -30,6 +32,7 @@ export async function loadMoreArchiveEvents(filterQuery: string, cursor: string)
 
 /** Details for the desktop side panel; `null` if the event no longer exists. */
 export async function loadEventDetail(eventId: string): Promise<EventDetailModel | null> {
+  await requireSession();
   const { locale } = await getI18n();
   return (await getEventDetail(String(eventId), queryContext({ locale }))) ?? null;
 }
@@ -49,6 +52,7 @@ async function curate<T>(write: () => Promise<CurationResult<T>>): Promise<Curat
 }
 
 export async function setFavorite(eventId: string, favorite: boolean): Promise<CurationResult> {
+  await requireSession();
   return curate(() => setEventFavorite(eventId, favorite === true));
 }
 
@@ -56,6 +60,7 @@ export async function setFavorite(eventId: string, favorite: boolean): Promise<C
 export async function loadCollections(
   eventId?: string,
 ): Promise<CurationResult<{ collections: CollectionSummary[]; memberOf: string[] }>> {
+  await requireSession();
   return curate(async () => {
     const collections = await listCollections();
     if (eventId === undefined) return { ok: true, value: { collections, memberOf: [] } };
@@ -65,17 +70,21 @@ export async function loadCollections(
 }
 
 export async function addCollection(name: string): Promise<CurationResult<CollectionSummary>> {
+  await requireSession();
   return curate(() => createCollection(name));
 }
 
 export async function changeCollectionName(collectionId: string, name: string): Promise<CurationResult> {
+  await requireSession();
   return curate(() => renameCollection(collectionId, name));
 }
 
 export async function removeCollection(collectionId: string): Promise<CurationResult> {
+  await requireSession();
   return curate(() => deleteCollection(collectionId));
 }
 
 export async function setCollectionMembership(collectionId: string, eventId: string, member: boolean): Promise<CurationResult> {
+  await requireSession();
   return curate(() => setEventInCollection(collectionId, eventId, member === true));
 }

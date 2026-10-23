@@ -1,18 +1,19 @@
 # Security policy
 
-Protect Archive UI stores and serves private camera recordings. It has **no integrated user
-login, sessions or per-camera authorization**. Access to its web port grants access to the archive
-and private APIs. The project is an independent third-party application, not an official Ubiquiti
+Protect Archive UI stores and serves private camera recordings. By default it has **no login**:
+access to its web port grants access to the archive and private APIs. An optional built-in login
+for a single account (`APP_LOGIN_USERNAME`, `APP_LOGIN_PASSWORD`) gates every page and API; it has
+no user management, roles or per-camera authorization. The project is an independent third-party application, not an official Ubiquiti
 service.
 
 ## Supported versions
 
 | Version | Security support |
 |---|---|
-| 1.0.x | Supported |
+| 2.1.x | Supported |
 | Older or unreleased revisions | Not supported |
 
-Fixes are released as new 1.0.x versions. Install the latest one after reading its release notes.
+Fixes are released as new versions of the latest minor release. Install the latest one after reading its release notes.
 This is a volunteer project: there is no guaranteed response time.
 
 ## Reporting a vulnerability privately
@@ -30,7 +31,8 @@ The normal Compose configuration publishes one web port on **0.0.0.0:3100** (con
 This means **all IPv4 host interfaces**, not automatically only your home LAN. Host firewall,
 VLANs, routing, public addresses and other network settings determine who can reach it.
 
-This convenience mode has no login and uses **unencrypted HTTP**. Use it only in trusted,
+Without the optional login this convenience mode is open to every reachable client, and it
+always uses **unencrypted HTTP** (a password typed on plain HTTP crosses the network readable). Use it only in trusted,
 appropriately restricted networks. Restrict the port to intended clients using your network boundary
 or a specific `UNIFI_ARCHIVE_BIND_IP`. Do not configure router port forwarding or directly expose
 this port to the public Internet. A private IP alone is not authentication or proof of isolation.
